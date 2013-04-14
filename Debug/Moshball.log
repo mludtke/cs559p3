@@ -1,8 +1,11 @@
-﻿Build started 4/14/2013 2:39:20 PM.
+﻿Build started 4/14/2013 2:50:54 PM.
      1>Project "\\wfs1\users$\morgan\My Documents\Visual Studio 2012\Projects\Moshball\Moshball\Moshball.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Program Files (x86)\FreeGLUT\include" /I"C:\Program Files (x86)\glew-1.7.0\include" /I"C:\Program Files (x86)\glm-0.9.3.4" /I./ /I"\\wfs1\users$\morgan\My Documents\FreeImage\Dist" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt Skybox.cpp
-         Skybox.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I"C:\Program Files (x86)\FreeGLUT\include" /I"C:\Program Files (x86)\glew-1.7.0\include" /I"C:\Program Files (x86)\glm-0.9.3.4" /I./ /I"\\wfs1\users$\morgan\My Documents\FreeImage\Dist" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>\\wfs1\users$\morgan\my documents\visual studio 2012\projects\moshball\moshball\main.cpp(114): warning C4018: '<' : signed/unsigned mismatch
+     1>\\wfs1\users$\morgan\my documents\visual studio 2012\projects\moshball\moshball\main.cpp(266): warning C4018: '<' : signed/unsigned mismatch
+     1>\\wfs1\users$\morgan\my documents\visual studio 2012\projects\moshball\moshball\main.cpp(395): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"\\wfs1\users$\morgan\My Documents\Visual Studio 2012\Projects\Moshball\Debug\Moshball.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Program Files (x86)\FreeGLUT\lib" /LIBPATH:"C:\Program Files (x86)\glew-1.7.0\lib" /LIBPATH:"C:\Program Files (x86)\glm-0.9.3.4" /LIBPATH:./ /LIBPATH:"\\wfs1\users$\morgan\My Documents\FreeImage\Dist" glew32.lib freeglut.lib Box2D.lib FreeImage.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"\\wfs1\users$\morgan\My Documents\Visual Studio 2012\Projects\Moshball\Debug\Moshball.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\wfs1\users$\morgan\My Documents\Visual Studio 2012\Projects\Moshball\Debug\Moshball.lib" /MACHINE:X86 Debug\JumboTron.obj
          Debug\main.obj
@@ -19,4 +22,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.54
+Time Elapsed 00:00:07.37

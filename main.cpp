@@ -275,8 +275,9 @@ void DisplayFunc()
 
 		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));
 		
-		//balls.at(i).Draw(projection, modelview, window.size);
-		ball.Draw(projection, modelview, window.size);
+		balls.at(i).Draw(projection, modelview, window.size);
+		//ball.Draw(projection, modelview, window.size);
+		//cout << balls.at(i).getTime()
 		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
 	}
 
@@ -398,7 +399,7 @@ GLint main(GLint argc, GLchar * argv[])
 			return 0;
 		cout << balls.at(i).getTime() << endl;
 	}
-	//cout << balls.at(5).getTime() << endl;
+	cout << balls.at(5).getTime() << " hey" << endl;
 	//cout << balls.size() << endl;
 	glutMainLoop();
 }
