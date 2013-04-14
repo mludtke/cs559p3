@@ -31,22 +31,31 @@ void Sphere::BuildNormalVisualizationGeometry()
 
 bool Sphere::hit(float time)
 {
+	if(!is_hit)
+	{
 	this->is_hit = true;
+	cout << "is hit" << is_hit;
+	}
 	return true;
 }
 
-float Sphere::getTime()
+bool Sphere::getTime()
 {
-	return time;
+	return is_hit;
 }
 
-bool Sphere::Initialize(int slices, int stacks, int shader, int hit)
+bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit)
 {
 	if (this->GLReturnedError("Top::Initialize - on entry"))
 		return false;
 
 	if (!super::Initialize())
 		return false;
+
+	if (hit == 0)
+		this->is_hit = false;
+	else
+		this->is_hit = true;
 
 	if (slices < 0)
 		slices = 1;
@@ -55,13 +64,13 @@ bool Sphere::Initialize(int slices, int stacks, int shader, int hit)
 	mat4 m;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
 	const int stacks_sphere = stacks;
-	const float radius = 1.0f;
+	//const float radius = 1.0f;
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
 	vec3 color = GREEN;
-	if (hit)
-		vec3 color = RED;
+	if (is_hit)
+		color = RED;
 
 	const float increment_stacks = (3.14159f) / float(stacks_sphere);
 	const float increment_slices = (3.14159f) / slices;
@@ -225,23 +234,6 @@ bool Sphere::Initialize(int slices, int stacks, int shader, int hit)
 		phi += increment_slices;
 
 	}
-/*	for (int i = 0; i < mesh.size(); ++i)
-	{
-		VertexAttributesPCN mesh_temp;
-		int left, right, up, down, left_up, right_up, left_down, right_down;
-		left = i - 1;
-		right = i + 1;
-		up = i - stacks;
-		down = i + stacks;
-		left_up = i - stacks - 1;
-		right_up = i - stacks + 1;
-		left_down = i + stacks - 1;
-		right_down = i + stacks + 1;
-
-		mesh.at(i).normal = normalize(mesh.at(i).position);
-
-
-	}*/
 
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
@@ -293,6 +285,9 @@ bool Sphere::Initialize(int slices, int stacks, int shader, int hit)
 */
 	if (this->GLReturnedError("Background::Initialize - on exit"))
 		return false;
+
+	is_hit = true;
+
 	return true;
 }
 
@@ -317,8 +312,6 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 
 	glEnable(GL_DEPTH_TEST);
 
-	//modelview = rotate(modelview, xRot, vec3(1.0f, 0.0f, 0.0f));
-	//modelview = rotate(modelview, yRot, vec3(0.0f, 1.0f, 0.0f));
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 

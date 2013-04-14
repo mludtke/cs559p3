@@ -40,7 +40,7 @@ bool Map::InitializeFloor()
 	mat4 m;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
 
-	const float radius = 1.0f;
+	const float height = 210.0f;
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
@@ -48,51 +48,64 @@ bool Map::InitializeFloor()
 	vec3 color2 = BLUE;
 	vec3 normal_floor = vec3(0.0f, 1.0f, 0.0f);
 
-	//create the floor coordinates
-	VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
 	x = -105.0f;
 	y = 0.0f;
 	z = 105.0f;
-	location = vec4(x, y, z, 1.0f);
 
-	cur_bottom_vertex.position = vec3(m * location);
-	cur_bottom_vertex.color = color;
-	cur_bottom_vertex.normal = vec3(normal_floor);
+	int steps = 15;
+	float increment = height / (float)steps;
 
-	x = 105.0f;
-	location = vec4(x, y, z, 1.0f);
-	nxt_bottom_vertex.position = vec3(m * location);
-	nxt_bottom_vertex.color = color;
-	nxt_bottom_vertex.normal = vec3(normal_floor);
+	//create the floor coordinates
+	for (int i = 0; i < steps; i++)
+	{
+		for (int j = 0; j < steps; j++)
+		{
+			VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
+		
+			location = vec4(x, y, z, 1.0f);
+			cur_bottom_vertex.position = vec3(m * location);
+			cur_bottom_vertex.color = color;
+			cur_bottom_vertex.normal = vec3(normal_floor);
 
-	z = -105.0f;
-	location = vec4(x, y, z, 1.0f);
-	nxt_top_vertex.position = vec3(m * location);
-	nxt_top_vertex.color = color;
-	nxt_top_vertex.normal = vec3(normal_floor);
+			x = x + increment;
+			location = vec4(x, y, z, 1.0f);
+			nxt_bottom_vertex.position = vec3(m * location);
+			nxt_bottom_vertex.color = color;
+			nxt_bottom_vertex.normal = vec3(normal_floor);
 
-	x = -105.0f;
-	location = vec4(x, y, z, 1.0f);
-	cur_top_vertex.position = vec3(m * location);
-	cur_top_vertex.color = color;
-	cur_top_vertex.normal = vec3(normal_floor);
+			z = z - increment;
+			location = vec4(x, y, z, 1.0f);
+			nxt_top_vertex.position = vec3(m * location);
+			nxt_top_vertex.color = color;
+			nxt_top_vertex.normal = vec3(normal_floor);
 
-	//Draw the floor
-	this->vertices.push_back(cur_bottom_vertex);
-	this->vertices.push_back(cur_top_vertex);
-	this->vertices.push_back(nxt_bottom_vertex);
-	this->vertices.push_back(nxt_top_vertex);
+			x = x - increment;
+			location = vec4(x, y, z, 1.0f);
+			cur_top_vertex.position = vec3(m * location);
+			cur_top_vertex.color = color;
+			cur_top_vertex.normal = vec3(normal_floor);
 
-	this->vertex_indices.push_back(vertices.size() - 1);
-	this->vertex_indices.push_back(vertices.size() - 3);
-	this->vertex_indices.push_back(vertices.size() - 4);
+			//Draw the floor
+			this->vertices.push_back(cur_bottom_vertex);
+			this->vertices.push_back(cur_top_vertex);
+			this->vertices.push_back(nxt_bottom_vertex);
+			this->vertices.push_back(nxt_top_vertex);
+
+			this->vertex_indices.push_back(vertices.size() - 1);
+			this->vertex_indices.push_back(vertices.size() - 3);
+			this->vertex_indices.push_back(vertices.size() - 4);
 			
-	this->vertex_indices.push_back(vertices.size() - 1);
-	this->vertex_indices.push_back(vertices.size() - 4);
-	this->vertex_indices.push_back(vertices.size() - 2);
+			this->vertex_indices.push_back(vertices.size() - 1);
+			this->vertex_indices.push_back(vertices.size() - 4);
+			this->vertex_indices.push_back(vertices.size() - 2);
 
-	BuildNormalVisualizationGeometry();
-
+			BuildNormalVisualizationGeometry();
+			x = x + increment;
+			z = z + increment;
+		}
+		x = -105.0f;
+		z = z - increment;
+	}
 
 /*	for (int i = 0; i < mesh.size(); ++i)
 	{

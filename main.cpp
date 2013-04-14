@@ -12,9 +12,13 @@ Project3 - Morgan Ludtke & Faiz Lurman
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 //#include "background.h"
 #include "sphere.h"
 #include "map.h"
+#include "JumboTron.h"
+#include "Skybox.h"
+//#include "Box2D\Box2D.h"
 
 using namespace std;
 using namespace glm;
@@ -40,9 +44,11 @@ public:
 	GLint handle;
 	GLint interval;
 	GLint FPS;
-	GLint slices;
-	GLint stacks;
-	GLint shader;
+	GLint slices;	//number of slices
+	GLint stacks;	//number of stacks
+	GLint shader;	//current shader
+	GLint num_balls;	//number of balls on field
+	GLfloat ball_radius;	//radius of the balls on the field
 	string title;
 	ivec2 size;
 	GLfloat aspect;
@@ -51,7 +57,10 @@ public:
 
 //create objects
 Sphere ball;
-Map ground, walls;
+Map ground, walls;	//map objects
+JumboTron tron;	//JumboTrons
+vector<Sphere> balls; //balls
+Skybox sky;
 
 static GLfloat xrot = 0.0f, yrot = 0.0f; //used for mouse movement
 static GLfloat xdiff = 0.0f, ydiff = 0.0f;	//used for mouse movement (old)
@@ -100,6 +109,12 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	ball.TakeDown();
 	ground.TakeDown();
 	walls.TakeDown();
+	tron.TakeDown();
+	sky.TakeDown();
+	for (int i = 0; i < balls.size(); i++)
+	{
+		balls.at(i).TakeDown();
+	}
 
 	cout << " Elapsed Time: " << GLfloat(glutGet(GLUT_ELAPSED_TIME)) / 1E3 << "s" << endl;
 	if (gameWon)
@@ -127,7 +142,7 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 		
 		break;
 
-	case 'w':
+	case 'w':	//Turn to wireframe mode
 		window.wireframe = !window.wireframe;
 		break;
 
@@ -145,9 +160,13 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 		window.paused = !window.paused;
 		break;
 
-	case 's':
+	case 's':	//change shader
 		window.shader++;
 	
+		break;
+
+	case ' ':	//jump
+		ypos = 3.0f;
 		break;
 	case 'x':
 	case 27:
@@ -164,7 +183,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 		++window.slices;
 		++window.stacks;
 		ball.TakeDown();
-		ball.Initialize(window.slices, window.stacks, window.shader, 0);
+		ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0);
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:	//decreases the number of vertices for all objects
@@ -175,7 +194,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 			--window.stacks;
 			window.stacks = clamp(window.stacks, 2, 50);
 			ball.TakeDown();
-			ball.Initialize(window.slices, window.stacks, window.shader, 0);
+			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0);
 			
 		}
 		break;
@@ -206,70 +225,61 @@ void DisplayFunc()
 
 	radius = 20.0f;
 
-	if (yDiffFromCenter > 0.0) //move forward
-	{
-		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.0001f);
-		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.0001f);
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+	//move forward and backwards
+	xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.001f);
+	zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.001f);
+	ypos = ypos + ((0 - ypos) * 0.003f);
+	lookatX = xpos - sin(angleV * (PI / 180)) * radius;
+	lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+	lookatY = ypos;
 		
-	}
-	if (yDiffFromCenter < -0.5) //move backward
-	{
-		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.0001f);
-		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.0001f);
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-
-	}
 	zpos = clamp(zpos, -104.0f, 104.0f);
 	xpos = clamp(xpos, -104.0f, 104.0f);
 
-	if (xDiffFromCenter > 0) // turn right
-	{
-		angleV = angleV - xDiffFromCenter * 0.005f;
-		lookatY = lookatY;
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-	}
-	if (xDiffFromCenter < 0) //turn left
-	{
-		angleV = angleV - xDiffFromCenter * 0.005f;
-		lookatY = lookatY;
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-	}
+	// turn right or left
+	angleV = angleV - xDiffFromCenter * 0.005f;
+	lookatY = lookatY;
+	lookatX = xpos - sin(angleV * (PI / 180)) * radius;
+	lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+	
 
 	mat4 modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+	sky.Draw(projection, modelview, window.size);
 
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	ground.Draw(projection, modelview, window.size);
 	walls.Draw(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	tron.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 214.0f));
+	tron.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+
+	modelview = translate(modelview, vec3(0.0f, -1.0f + window.ball_radius, 0.0f));	//make sure balls are on ground
 	ball.Draw(projection, modelview, window.size);
-	
+
 	srand (5);
+	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
+	{
+		int rand_int = rand() % 200 - 100;
+		float rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberX = rand_float + float(rand_int);
+		rand_int = rand() % 200 - 100;
+		rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberZ = rand_float + float(rand_int);
 
-	for (int i = 0; i < 5; i++){
-	int rand_int = rand() % 200 - 100;
-	float rand_float = ((float) rand()) / (float) RAND_MAX;
-	float rand_numberX = rand_float * float(rand_int);
-	rand_int = rand() % 200 - 100;
-	rand_float = ((float) rand()) / (float) RAND_MAX;
-	float rand_numberY = rand_float * float(rand_int);
 
-	modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberY));
-	ball.Draw(projection, modelview, window.size);
-	modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberY));
+		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));
+		
+		//balls.at(i).Draw(projection, modelview, window.size);
+		ball.Draw(projection, modelview, window.size);
+		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
 	}
 
-	/*
-	modelview = translate(modelview, vec3(20.0f, 0.0f, 20.0f));
-	modelview = translate(modelview, vec3(lookatX, lookatY, lookatZ));
-	ball.Draw(projection, modelview, window.size);
-	*/
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DisplayInstructions();
 	glFlush();
@@ -316,12 +326,12 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 	xDiffFromCenter = (x - winX) / 100;
 	yDiffFromCenter = (winY - y) / 100;
 
-	cout << "look at z: " << lookatZ << endl;
+	/*cout << "look at z: " << lookatZ << endl;
 	cout << "look at x:     " << lookatX << endl;
 	cout << "z diff: " << yDiffFromCenter << endl;
 	cout << "x diff:     " << xDiffFromCenter << endl;
 	cout << "angle: " << angleV << endl;
-
+*/
 }
 
 GLint main(GLint argc, GLchar * argv[])
@@ -332,20 +342,27 @@ GLint main(GLint argc, GLchar * argv[])
 	zpos = 20.0f;
 	angleH = 0.0f;
 	angleV = 0.0f;
+	window.num_balls = 20;
+	window.ball_radius = 1.0f;
 
 	glutInit(&argc, argv);
-	glutInitWindowSize(1096, 1024);
+	glutInitWindowSize(1300, 960);
 	glutInitWindowPosition(500, 100);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
+
+	//box2D functions
+	//b2Vec2 gravity(0.0f, -10.0f);
+	//bool doSleep = true;
+	//b2World world(gravity);
 
 	window.handle = glutCreateWindow(window.title.c_str());
 	glutReshapeFunc(ReshapeFunc);
 	glutCloseFunc(CloseFunc); // our takedown actions
 	glutDisplayFunc(DisplayFunc);
 
-	glutMouseFunc(MouseFunc);
-	glutMotionFunc(MotionFunc); 
-	glutPassiveMotionFunc(passiveMotionFunc);
+	//glutMouseFunc(MouseFunc);
+	//glutMotionFunc(MotionFunc); 
+	glutPassiveMotionFunc(passiveMotionFunc);	//detect mouse movement
 	glutSetCursor(GLUT_CURSOR_FULL_CROSSHAIR);
 
 	glutKeyboardFunc(KeyboardFunc);
@@ -359,11 +376,29 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(GLEW_OK == glewInit());	
 
 	//initialize all objects, and returns error if failed
-	if (!ball.Initialize(window.slices, window.stacks, window.shader, 0))
+	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1))
 		return 0;
 	if (!ground.InitializeFloor())
 		return 0;
 	if (!walls.InitializeWalls())
 		return 0;
+	if (!tron.InitializeCylinder())
+		return 0;
+	if (!sky.Initialize(window.slices, window.stacks))
+		return 0;
+
+	for (int i = 0; i < window.num_balls; i++)
+	{
+		Sphere baller;
+		balls.push_back(baller);
+	}
+	for (int i = 0; i < balls.size(); i++)
+	{
+		if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0))
+			return 0;
+		cout << balls.at(i).getTime() << endl;
+	}
+	//cout << balls.at(5).getTime() << endl;
+	//cout << balls.size() << endl;
 	glutMainLoop();
 }

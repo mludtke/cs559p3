@@ -11,11 +11,11 @@ class Sphere : public Object
 public:
 	Sphere();
 	
-	bool Initialize(int slices, int stacks, int shader, int hit);
+	bool Initialize(int slices, int stacks, float radius, int shader, int hit);
 
 	bool hit(float time);
 
-	float getTime();
+	bool getTime();
 
 	virtual void Draw(const glm::ivec2 & size);
 	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
