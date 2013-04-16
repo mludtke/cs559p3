@@ -434,6 +434,60 @@ bool Map::InitializeWalls()
 	return true;
 }
 
+bool Map::InitializeCursor()
+{
+	if (this->GLReturnedError("World::Initialize - on entry"))
+		return false;
+
+	if (!super::Initialize())
+		return false;	
+
+	//creates a cursor
+	//==============================================
+	VertexAttributesPCN  yAxisBottom, xAxisRight, yAxisTop, xAxisLeft;			
+	yAxisTop.position  = vec3(0.0f, 0.25f, 0.0f);
+	yAxisTop.color     = WHITE;
+	xAxisRight.position  = vec3(0.25f, 0.0f, 0.0f);
+	xAxisRight.color     = WHITE;
+	yAxisBottom.position = vec3(0.0f, -0.25f, 0.0f);
+	yAxisBottom.color    = WHITE;
+	xAxisLeft.position  = vec3(-0.25f, 0.0f, 0.0f);
+	xAxisLeft.color    = WHITE;
+
+	vertices.push_back(yAxisTop);
+	vertices.push_back(yAxisBottom);
+	vertices.push_back(xAxisRight);
+	vertices.push_back(xAxisLeft);
+
+	// y-axis
+	vertex_indices.push_back(vertices.size() - 1);
+	vertex_indices.push_back(vertices.size() - 2);
+	// x-axis
+	vertex_indices.push_back(vertices.size() - 3);
+	vertex_indices.push_back(vertices.size() - 4);
+	//==============================================
+	
+
+	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
+		return false;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 1));	
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	assert(this->shader.Initialize("phong_shader.vert", "phong_shader.frag"));
+
+	if (this->GLReturnedError("World::Initialize - on exit"))
+		return false;
+
+	return true;
+}
+
 void Map::TakeDown()
 {
 	this->vertices.clear();
@@ -455,8 +509,6 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 
 	glEnable(GL_DEPTH_TEST);
 
-	//modelview = rotate(modelview, xRot, vec3(1.0f, 0.0f, 0.0f));
-	//modelview = rotate(modelview, yRot, vec3(0.0f, 1.0f, 0.0f));
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 
@@ -496,6 +548,29 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 	}
 
 	if (this->GLReturnedError("Top::Draw - on exit"))
+		return;
+}
+
+void Map::DrawCursor(const mat4 & projection, mat4 modelview, const ivec2 & size)
+{
+	if (this->GLReturnedError("World::Draw - on entry"))
+		return;
+
+	glEnable(GL_DEPTH_TEST);
+
+	mat4 mvp = projection * modelview;
+	mat3 nm = inverse(transpose(mat3(modelview)));
+
+	shader.Use();
+	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+	glBindVertexArray(this->vertex_array_handle);
+	glLineWidth(1.5f);
+	glDrawElements(GL_LINES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
+	glLineWidth(1.0f);
+	glBindVertexArray(0);
+	glUseProgram(0);	
+
+	if (this->GLReturnedError("World::Draw - on exit"))
 		return;
 }
 

@@ -53,11 +53,12 @@ public:
 	ivec2 size;
 	GLfloat aspect;
 	vector<string> instructions;
+	vector<string> plus_sign;
 } window;
 
 //create objects
 Sphere ball;
-Map ground, walls;	//map objects
+Map ground, walls, cursor;	//map objects
 JumboTron tron;	//JumboTrons
 vector<Sphere> balls; //balls
 Skybox sky;
@@ -94,6 +95,33 @@ void DisplayInstructions()
 	glLoadIdentity();
 	glTranslated(10, 15 * s->size(), -5.5);
 	glScaled(0.1, 0.1, 1.0);
+	for (auto i = s->begin(); i < s->end(); ++i)
+	{
+		glPushMatrix();
+		glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *) (*i).c_str());
+		glPopMatrix();
+		glTranslated(0, -150, 0);
+	}
+}
+
+void DisplayCursor()
+{
+	if (window.handle == -1)
+		return;
+
+	vector<string> * s = &window.plus_sign;
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, window.size.x, 0, window.size.y, 1, 10);
+	glViewport(0, 0, window.size.x, window.size.y);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslated(window.size.x / 2.0 - s->size(), window.size.y / 2.0 - s->size(), -5.5);
+	glScaled(0.6, 0.6, 1.0);
 	for (auto i = s->begin(); i < s->end(); ++i)
 	{
 		glPushMatrix();
@@ -183,7 +211,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 		++window.slices;
 		++window.stacks;
 		ball.TakeDown();
-		ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0);
+		ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime(), ball.getPostion());
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:	//decreases the number of vertices for all objects
@@ -194,7 +222,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 			--window.stacks;
 			window.stacks = clamp(window.stacks, 2, 50);
 			ball.TakeDown();
-			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0);
+			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime(), ball.getPostion());
 			
 		}
 		break;
@@ -211,6 +239,65 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 
 }
 
+//void DisplayFunc2()
+//{
+//	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+//
+//	glEnable(GL_CULL_FACE);
+//
+//	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//	glViewport(0, 0, window.size.x/4.0f, window.size.y/4.0f);
+//
+//	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 300.0f);
+//
+//	mat4 modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+//	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+//
+//	sky.Draw(projection, modelview, window.size);
+//
+//	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+//	ground.Draw(projection, modelview, window.size);
+//	walls.Draw(projection, modelview, window.size);
+//	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
+//
+//	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+//	tron.Draw(projection, modelview, window.size);
+//	modelview = translate(modelview, vec3(0.0f, 0.0f, 214.0f));
+//	tron.Draw(projection, modelview, window.size);
+//	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+//
+//	//cursor.DrawCursor(projection, modelview, window.size);
+//
+//	modelview = translate(modelview, vec3(0.0f, -1.0f + window.ball_radius, 0.0f));	//make sure balls are on ground
+//	//ball.Draw(projection, modelview, window.size);
+//
+//	srand (5);
+//	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
+//	{
+//		int rand_int = rand() % 200 - 100;
+//		float rand_float = ((float) rand()) / (float) RAND_MAX;
+//		float rand_numberX = rand_float + float(rand_int);
+//		rand_int = rand() % 200 - 100;
+//		rand_float = ((float) rand()) / (float) RAND_MAX;
+//		float rand_numberZ = rand_float + float(rand_int);
+//
+//
+//		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));
+//		
+//		//balls.at(i).Draw(projection, modelview, window.size);
+//		//ball.Draw(projection, modelview, window.size);
+//		//cout << balls.at(i).getTime() << endl;
+//		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
+//	}
+//
+//	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//	glFlush();
+//	glutPostRedisplay(); // FPS
+//
+//}
+
+
 void DisplayFunc()
 {
 	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -222,6 +309,7 @@ void DisplayFunc()
 	glViewport(0, 0, window.size.x, window.size.y);
 
 	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 300.0f);
+
 
 	radius = 20.0f;
 
@@ -243,6 +331,21 @@ void DisplayFunc()
 	lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
 	
 
+	if (!gameWon)
+	{
+	if (ball.getPostion().x + 1.1 * window.ball_radius >= xpos * 1.1 && ball.getPostion().x - 1.1 * window.ball_radius <= xpos * 1.1)
+	{
+		if (ball.getPostion().z + 1.1 * window.ball_radius >= zpos * 1.1 && ball.getPostion().z - 1.1 * window.ball_radius <= zpos * 1.1)
+		{
+			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f));
+			//hit();
+			gameWon = true;
+			cout << ball.getTime() << endl;
+			lookatZ = -lookatZ;
+		}	
+	}
+	}
+
 	mat4 modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 
@@ -259,10 +362,16 @@ void DisplayFunc()
 	tron.Draw(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
 
+
+
 	modelview = translate(modelview, vec3(0.0f, -1.0f + window.ball_radius, 0.0f));	//make sure balls are on ground
 	ball.Draw(projection, modelview, window.size);
 
-	srand (5);
+
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 10.0f));
+	//DisplayFunc2();
+
+	srand (10);		//seed generator
 	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
 	{
 		int rand_int = rand() % 200 - 100;
@@ -272,20 +381,24 @@ void DisplayFunc()
 		rand_float = ((float) rand()) / (float) RAND_MAX;
 		float rand_numberZ = rand_float + float(rand_int);
 
-
-		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));
+		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));	//places in random location
 		
-		balls.at(i).Draw(projection, modelview, window.size);
-		//ball.Draw(projection, modelview, window.size);
-		//cout << balls.at(i).getTime()
+		//balls.at(i).Draw(projection, modelview, window.size);
+		ball.Draw(projection, modelview, window.size);
+		//cout << balls.at(i).getTime() << endl;
 		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	DisplayInstructions();
+
+	DisplayCursor();
+
 	glFlush();
 	glutPostRedisplay(); // FPS
 }
+
+
 
 GLvoid TimerFunc(GLint value)	//keeps track of time to be displayed on window
 {
@@ -327,6 +440,22 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 	xDiffFromCenter = (x - winX) / 100;
 	yDiffFromCenter = (winY - y) / 100;
 
+	if (xDiffFromCenter < -1.0f || xDiffFromCenter > 1.0f)
+		glutSetCursor(GLUT_CURSOR_LEFT_RIGHT);
+	if (xDiffFromCenter < -1.0f && yDiffFromCenter > 1.0f)
+		glutSetCursor(GLUT_CURSOR_TOP_LEFT_CORNER);
+	if (xDiffFromCenter > 1.0f && yDiffFromCenter > 1.0f)
+		glutSetCursor(GLUT_CURSOR_TOP_RIGHT_CORNER);
+	if (xDiffFromCenter > 1.0f && yDiffFromCenter < -1.0f)
+		glutSetCursor(GLUT_CURSOR_BOTTOM_RIGHT_CORNER);
+	if (xDiffFromCenter < 1.0f && yDiffFromCenter < -1.0f)
+		glutSetCursor(GLUT_CURSOR_BOTTOM_LEFT_CORNER);
+	if (xDiffFromCenter > -1.0f && xDiffFromCenter < 1.0f && yDiffFromCenter > -1.0f && yDiffFromCenter < 1.0f)
+		glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+	if (xDiffFromCenter > -1.0f && xDiffFromCenter < 1.0f && (yDiffFromCenter < -1.0f || yDiffFromCenter > 1.0f))
+		glutSetCursor(GLUT_CURSOR_UP_DOWN);
+		
+	
 	/*cout << "look at z: " << lookatZ << endl;
 	cout << "look at x:     " << lookatX << endl;
 	cout << "z diff: " << yDiffFromCenter << endl;
@@ -361,10 +490,8 @@ GLint main(GLint argc, GLchar * argv[])
 	glutCloseFunc(CloseFunc); // our takedown actions
 	glutDisplayFunc(DisplayFunc);
 
-	//glutMouseFunc(MouseFunc);
-	//glutMotionFunc(MotionFunc); 
 	glutPassiveMotionFunc(passiveMotionFunc);	//detect mouse movement
-	glutSetCursor(GLUT_CURSOR_FULL_CROSSHAIR);
+	glutSetCursor(GLUT_CURSOR_UP_DOWN);
 
 	glutKeyboardFunc(KeyboardFunc);
 	glutSpecialFunc(SpecialFunc);
@@ -374,10 +501,13 @@ GLint main(GLint argc, GLchar * argv[])
 	window.instructions.push_back("Time played: ");
 	window.instructions.push_back("Targets remaining: ");
 
+	window.plus_sign.push_back("+");
+	
+
 	assert(GLEW_OK == glewInit());	
 
 	//initialize all objects, and returns error if failed
-	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1))
+	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
 		return 0;
 	if (!ground.InitializeFloor())
 		return 0;
@@ -395,7 +525,7 @@ GLint main(GLint argc, GLchar * argv[])
 	}
 	for (int i = 0; i < balls.size(); i++)
 	{
-		if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0))
+		if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
 			return 0;
 		cout << balls.at(i).getTime() << endl;
 	}

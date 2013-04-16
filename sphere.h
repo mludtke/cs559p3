@@ -11,11 +11,13 @@ class Sphere : public Object
 public:
 	Sphere();
 	
-	bool Initialize(int slices, int stacks, float radius, int shader, int hit);
+	bool Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time, glm::vec3 position);
 
 	bool hit(float time);
 
-	bool getTime();
+	float getTime();
+	glm::vec3 getPostion();
+	void setPosition(glm::vec3 pos);
 
 	virtual void Draw(const glm::ivec2 & size);
 	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
@@ -31,4 +33,5 @@ private:
 	typedef Object super;
 	bool is_hit;
 	float time;
+	glm::vec3 position;
 };

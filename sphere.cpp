@@ -33,18 +33,30 @@ bool Sphere::hit(float time)
 {
 	if(!is_hit)
 	{
-	this->is_hit = true;
-	cout << "is hit" << is_hit;
+		this->is_hit = true;
+		cout << "is hit" << is_hit;
 	}
 	return true;
 }
 
-bool Sphere::getTime()
+float Sphere::getTime()
 {
-	return is_hit;
+	if (!is_hit)
+		return 1.0f;
+	return 0.0f;
 }
 
-bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit)
+vec3 Sphere::getPostion()
+{
+	return this->position;
+}
+
+void Sphere::setPosition(vec3 pos)
+{
+	position = pos;
+}
+
+bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time, vec3 position)
 {
 	if (this->GLReturnedError("Top::Initialize - on entry"))
 		return false;
@@ -60,6 +72,9 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	if (slices < 0)
 		slices = 1;
 
+	this->time = born_time;
+	this->position = position;
+
 	//slices *= 4;
 	mat4 m;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
@@ -68,9 +83,9 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
-	vec3 color = GREEN;
+	vec3 color = RED;
 	if (is_hit)
-		color = RED;
+		color = GREEN;
 
 	const float increment_stacks = (3.14159f) / float(stacks_sphere);
 	const float increment_slices = (3.14159f) / slices;
@@ -352,6 +367,8 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 
 	if (this->GLReturnedError("Top::Draw - on exit"))
 		return;
+
+	time -= 1E3;
 }
 
 
