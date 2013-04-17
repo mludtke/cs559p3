@@ -368,7 +368,7 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 	if (this->GLReturnedError("Top::Draw - on exit"))
 		return;
 
-	time -= 1E3;
+	//time -= 1E3;
 }
 
 

@@ -311,7 +311,7 @@ bool Skybox::Initialize(int slices, int stacks)
 
 	#pragma region Code to make FreeImage work
 
-		if (!TextureManager::Inst()->LoadTexture((const char *) "./stone.jpg", 0))
+		if (!TextureManager::Inst()->LoadTexture((const char *) "./blue-sky-texture.jpg", 0))
 			return false;
 
 		glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);

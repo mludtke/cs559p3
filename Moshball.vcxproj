@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="fbo.cpp" />
     <ClCompile Include="JumboTron.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="map.cpp" />
@@ -94,6 +95,7 @@
     <ClCompile Include="vertexattributes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="fbo.h" />
     <ClInclude Include="JumboTron.h" />
     <ClInclude Include="map.h" />
     <ClInclude Include="Object.h" />
@@ -107,8 +109,6 @@
   <ItemGroup>
     <None Include="basic_texture_shader.frag" />
     <None Include="basic_texture_shader.vert" />
-    <None Include="gouraud_shader.frag" />
-    <None Include="gouraud_shader.vert" />
     <None Include="phong_shader.frag" />
     <None Include="phong_shader.vert" />
   </ItemGroup>

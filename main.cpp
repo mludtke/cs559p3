@@ -12,7 +12,6 @@ Project3 - Morgan Ludtke & Faiz Lurman
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 //#include "background.h"
 #include "sphere.h"
 #include "map.h"
@@ -54,7 +53,8 @@ public:
 	GLfloat aspect;
 	vector<string> instructions;
 	vector<string> plus_sign;
-} window;
+	vector<string> small_screen;
+} window, window2;
 
 //create objects
 Sphere ball;
@@ -118,6 +118,33 @@ void DisplayCursor()
 	glLoadIdentity();
 	glOrtho(0, window.size.x, 0, window.size.y, 1, 10);
 	glViewport(0, 0, window.size.x, window.size.y);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslated(window.size.x / 2.0 - 30, window.size.y / 2.0 - 30, -5.5);
+	glScaled(0.6, 0.6, 1.0);
+	for (auto i = s->begin(); i < s->end(); ++i)
+	{
+		glPushMatrix();
+		glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *) (*i).c_str());
+		glPopMatrix();
+		glTranslated(0, -150, 0);
+	}
+}
+
+void DisplayMAP()
+{
+	if (window.handle == -1)
+		return;
+
+	vector<string> * s = &window.plus_sign;
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, window.size.x, 0, window.size.y, 1, 10);
+	glViewport(0, 0, window.size.x/4, window.size.y/4);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glTranslated(window.size.x / 2.0 - s->size(), window.size.y / 2.0 - s->size(), -5.5);
@@ -238,7 +265,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 	return;
 
 }
-
+//
 //void DisplayFunc2()
 //{
 //	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -251,7 +278,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 //
 //	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 300.0f);
 //
-//	mat4 modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+//	mat4 modelview = lookAt(vec3(0.0f, 15.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 //	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 //
 //	sky.Draw(projection, modelview, window.size);
@@ -302,34 +329,37 @@ void DisplayFunc()
 {
 	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 
 	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, window.size.x, window.size.y);
 
-	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 300.0f);
+	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
 
 
 	radius = 20.0f;
 
-	//move forward and backwards
-	xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.001f);
-	zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.001f);
-	ypos = ypos + ((0 - ypos) * 0.003f);
-	lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-	lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-	lookatY = ypos;
+	//movement (with a buffer zone in center
+	if (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f)
+	{
+		//move forward and backwards
+		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.001f);
+		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.001f);
+		ypos = ypos + ((0 - ypos) * 0.003f);
+		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
+		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+		lookatY = ypos;
 		
-	zpos = clamp(zpos, -104.0f, 104.0f);
-	xpos = clamp(xpos, -104.0f, 104.0f);
+		zpos = clamp(zpos, -104.0f, 104.0f);
+		xpos = clamp(xpos, -104.0f, 104.0f);
 
-	// turn right or left
-	angleV = angleV - xDiffFromCenter * 0.005f;
-	lookatY = lookatY;
-	lookatX = xpos - sin(angleV * (PI / 180)) * radius;
-	lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-	
+		// turn right or left
+		angleV = angleV - xDiffFromCenter * 0.005f;
+		lookatY = lookatY;
+		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
+		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+	}
 
 	if (!gameWon)
 	{
@@ -368,7 +398,7 @@ void DisplayFunc()
 	ball.Draw(projection, modelview, window.size);
 
 
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 10.0f));
+	//modelview = translate(modelview, vec3(0.0f, 0.0f, 10.0f));
 	//DisplayFunc2();
 
 	srand (10);		//seed generator
@@ -456,12 +486,12 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 		glutSetCursor(GLUT_CURSOR_UP_DOWN);
 		
 	
-	/*cout << "look at z: " << lookatZ << endl;
-	cout << "look at x:     " << lookatX << endl;
-	cout << "z diff: " << yDiffFromCenter << endl;
+	//cout << "look at z: " << lookatZ << endl;
+	//cout << "look at x:     " << lookatX << endl;
+	cout << "y diff: " << yDiffFromCenter << endl;
 	cout << "x diff:     " << xDiffFromCenter << endl;
 	cout << "angle: " << angleV << endl;
-*/
+
 }
 
 GLint main(GLint argc, GLchar * argv[])
@@ -483,12 +513,13 @@ GLint main(GLint argc, GLchar * argv[])
 	//box2D functions
 	//b2Vec2 gravity(0.0f, -10.0f);
 	//bool doSleep = true;
-	//b2World world(gravity);
+	//b2World world(gravity); 
 
 	window.handle = glutCreateWindow(window.title.c_str());
 	glutReshapeFunc(ReshapeFunc);
 	glutCloseFunc(CloseFunc); // our takedown actions
 	glutDisplayFunc(DisplayFunc);
+
 
 	glutPassiveMotionFunc(passiveMotionFunc);	//detect mouse movement
 	glutSetCursor(GLUT_CURSOR_UP_DOWN);
@@ -502,6 +533,8 @@ GLint main(GLint argc, GLchar * argv[])
 	window.instructions.push_back("Targets remaining: ");
 
 	window.plus_sign.push_back("+");
+
+	window.small_screen.push_back("hello world");
 	
 
 	assert(GLEW_OK == glewInit());	
@@ -509,6 +542,7 @@ GLint main(GLint argc, GLchar * argv[])
 	//initialize all objects, and returns error if failed
 	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
 		return 0;
+	cout << "ball: " << ball.shader.program_id << endl;
 	if (!ground.InitializeFloor())
 		return 0;
 	if (!walls.InitializeWalls())
@@ -521,6 +555,7 @@ GLint main(GLint argc, GLchar * argv[])
 	for (int i = 0; i < window.num_balls; i++)
 	{
 		Sphere baller;
+		//baller.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f));
 		balls.push_back(baller);
 	}
 	for (int i = 0; i < balls.size(); i++)
@@ -528,8 +563,10 @@ GLint main(GLint argc, GLchar * argv[])
 		if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
 			return 0;
 		cout << balls.at(i).getTime() << endl;
+		cout << " " << balls.at(i).shader.program_id << endl;
 	}
-	cout << balls.at(5).getTime() << " hey" << endl;
+	
+	//cout << balls.at(5).getTime() << " hey" << endl;
 	//cout << balls.size() << endl;
 	glutMainLoop();
 }

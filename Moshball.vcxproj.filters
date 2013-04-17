@@ -45,6 +45,9 @@
     <ClCompile Include="textureshader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
@@ -74,10 +77,11 @@
     <ClInclude Include="TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="gouraud_shader.frag" />
-    <None Include="gouraud_shader.vert" />
     <None Include="phong_shader.frag" />
     <None Include="phong_shader.vert" />
     <None Include="basic_texture_shader.frag" />
