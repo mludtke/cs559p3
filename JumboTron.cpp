@@ -48,6 +48,7 @@ bool JumboTron::InitializeCylinder()
 	y = 0.0f;
 	vec4 location;
 	vec3 color = CYAN;
+	vec3 color2 = WHITE;
 	float height = 5.0f;
 
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
@@ -111,6 +112,35 @@ bool JumboTron::InitializeCylinder()
 		}
 		y += stack_increment;
 	}
+
+	bottomLeft.position = vec3(-5.0f, 5.0f, -0.5f);
+	bottomLeft.color = color2;
+	bottomLeft.normal = vec3(-5.0f, 5.0f, -1.0f);
+
+	bottomRight.position = vec3(5.0f, 5.0f, -0.5f);
+	bottomRight.color = color2;
+	bottomRight.normal = vec3(5.0f, 5.0f, -1.0f);
+
+	topRight.position = vec3(5.0f, 10.0f, -0.5f);
+	topRight.color = color2;
+	topRight.normal = vec3(5.0f, 10.0f, -1.0f);
+
+	topLeft.position = vec3(-5.0f, 10.0f, -0.5f);
+	topLeft.color = color2;
+	topLeft.normal = vec3(-5.0f, 10.0f, -1.0f);
+
+	this->vertices.push_back(bottomLeft);
+	this->vertices.push_back(bottomRight);
+	this->vertices.push_back(topRight);
+	this->vertices.push_back(topLeft);
+
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 3);
+	this->vertex_indices.push_back(vertices.size() - 4);
+			
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 3);
 
 
 

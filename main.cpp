@@ -62,6 +62,7 @@ Map ground, walls, cursor;	//map objects
 JumboTron tron;	//JumboTrons
 vector<Sphere> balls; //balls
 Skybox sky;
+Sphere baller;
 
 static GLfloat xrot = 0.0f, yrot = 0.0f; //used for mouse movement
 static GLfloat xdiff = 0.0f, ydiff = 0.0f;	//used for mouse movement (old)
@@ -413,8 +414,8 @@ void DisplayFunc()
 
 		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));	//places in random location
 		
-		//balls.at(i).Draw(projection, modelview, window.size);
-		ball.Draw(projection, modelview, window.size);
+		balls.at(i).Draw(projection, modelview, window.size);
+		//ball.Draw(projection, modelview, window.size);
 		//cout << balls.at(i).getTime() << endl;
 		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
 	}
@@ -554,7 +555,7 @@ GLint main(GLint argc, GLchar * argv[])
 
 	for (int i = 0; i < window.num_balls; i++)
 	{
-		Sphere baller;
+		//Sphere baller;
 		//baller.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f));
 		balls.push_back(baller);
 	}
@@ -565,7 +566,8 @@ GLint main(GLint argc, GLchar * argv[])
 		cout << balls.at(i).getTime() << endl;
 		cout << " " << balls.at(i).shader.program_id << endl;
 	}
-	
+	if (!balls.at(5).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
+		return 0;
 	//cout << balls.at(5).getTime() << " hey" << endl;
 	//cout << balls.size() << endl;
 	glutMainLoop();
