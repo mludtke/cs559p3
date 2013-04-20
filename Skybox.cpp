@@ -51,16 +51,16 @@ bool Skybox::Initialize(int slices, int stacks)
 
 	//create the wall (wall one)
 	VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
-	x = -120.0f;
-	y = 30.0f;
-	z = -120.0f;
+	x = -160.0f;
+	y = 60.0f;
+	z = -160.0f;
 	
 	location = vec4(x, y, z, 1.0f);
 	cur_top_vertex.position = vec3(m * location);
 	cur_top_vertex.color = color2;
 	cur_top_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
-	x = 120.0f;
+	x = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_top_vertex.position = vec3(m * location);
 	nxt_top_vertex.color = color2;
@@ -72,7 +72,7 @@ bool Skybox::Initialize(int slices, int stacks)
 	nxt_bottom_vertex.color = color2;
 	nxt_bottom_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
-	x = -120.0f;
+	x = -160.0f;
 	location = vec4(x, y, z, 1.0f);
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;
@@ -92,16 +92,16 @@ bool Skybox::Initialize(int slices, int stacks)
 	this->vertex_indices.push_back(vertices.size() - 4);
 
 	//wall 2
-	x = -120.0f;
-	y = 30.0f;
-	z = 120.0f;
+	x = -160.0f;
+	y = 60.0f;
+	z = 160.0f;
 	
 	location = vec4(x, y, z, 1.0f);
 	cur_top_vertex.position = vec3(m * location);
 	cur_top_vertex.color = color2;
 	cur_top_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
-	z = -120.0f;
+	z = -160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_top_vertex.position = vec3(m * location);
 	nxt_top_vertex.color = color2;
@@ -113,7 +113,7 @@ bool Skybox::Initialize(int slices, int stacks)
 	nxt_bottom_vertex.color = color2;
 	nxt_bottom_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
-	z = 120.0f;
+	z = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;
@@ -133,16 +133,16 @@ bool Skybox::Initialize(int slices, int stacks)
 	this->vertex_indices.push_back(vertices.size() - 4);
 
 	//wall 3
-	x = 120.0f;
-	y = 30.0f;
-	z = 120.0f;
+	x = 160.0f;
+	y = 60.0f;
+	z = 160.0f;
 	
 	location = vec4(x, y, z, 1.0f);
 	cur_top_vertex.position = vec3(m * location);
 	cur_top_vertex.color = color2;
 	cur_top_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	x = -120.0f;
+	x = -160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_top_vertex.position = vec3(m * location);
 	nxt_top_vertex.color = color2;
@@ -154,7 +154,7 @@ bool Skybox::Initialize(int slices, int stacks)
 	nxt_bottom_vertex.color = color2;
 	nxt_bottom_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	x = 120.0f;
+	x = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;
@@ -174,16 +174,16 @@ bool Skybox::Initialize(int slices, int stacks)
 	this->vertex_indices.push_back(vertices.size() - 4);
 
 	//wall 4
-	x = 120.0f;
-	y = 30.0f;
-	z = -120.0f;
+	x = 160.0f;
+	y = 60.0f;
+	z = -160.0f;
 	
 	location = vec4(x, y, z, 1.0f);
 	cur_top_vertex.position = vec3(m * location);
 	cur_top_vertex.color = color2;
 	cur_top_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
-	z = 120.0f;
+	z = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_top_vertex.position = vec3(m * location);
 	nxt_top_vertex.color = color2;
@@ -195,7 +195,7 @@ bool Skybox::Initialize(int slices, int stacks)
 	nxt_bottom_vertex.color = color2;
 	nxt_bottom_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
-	z = -120.0f;
+	z = -160.0f;
 	location = vec4(x, y, z, 1.0f);
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;
@@ -215,28 +215,28 @@ bool Skybox::Initialize(int slices, int stacks)
 	this->vertex_indices.push_back(vertices.size() - 4);
 
 	//top
-	x = -120.0f;
-	y = 30.0f;
-	z = -120.0f;
+	x = -160.0f;
+	y = 60.0f;
+	z = -160.0f;
 	
 	location = vec4(x, y, z, 1.0f);
 	cur_top_vertex.position = vec3(m * location);
 	cur_top_vertex.color = color2;
 	cur_top_vertex.normal = vec3(0.0f, 1.0f, 0.0f);
 
-	x = 120.0f;
+	x = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_top_vertex.position = vec3(m * location);
 	nxt_top_vertex.color = color2;
 	nxt_top_vertex.normal = vec3(0.0f, 1.0f, 0.0f);
 
-	z = 120.0f;
+	z = 160.0f;
 	location = vec4(x, y, z, 1.0f);
 	nxt_bottom_vertex.position = vec3(m * location);
 	nxt_bottom_vertex.color = color2;
 	nxt_bottom_vertex.normal = vec3(0.0f, 1.0f, 0.0f);
 
-	x = -120.0f;
+	x = -160.0f;
 	location = vec4(x, y, z, 1.0f);
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;

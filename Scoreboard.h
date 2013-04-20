@@ -1,4 +1,3 @@
-
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -6,18 +5,12 @@
 #include "object.h"
 #include "shader.h"
 
-class Sphere : public Object
+class Scoreboard : public Object
 {
 public:
-	Sphere();
+	Scoreboard();
 	
-	bool Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time);
-
-	bool hit(float time);
-
-	float getTime();
-	glm::vec3 getPostion();
-	void setPosition(glm::vec3 pos);
+	bool Initialize();
 
 	virtual void Draw(const glm::ivec2 & size);
 	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
@@ -31,7 +24,5 @@ private:
 	glm::vec4 colors[2];
 	std::vector<VertexAttributesPCN> vertices;
 	typedef Object super;
-	bool is_hit;
 	float time;
-	glm::vec3 position;
 };

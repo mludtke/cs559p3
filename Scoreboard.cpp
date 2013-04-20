@@ -3,12 +3,12 @@
 */
 
 #include <iostream>
-#include "Sphere.h"
+#include "Scoreboard.h"
 
 using namespace std;
 using namespace glm;
 
-Sphere::Sphere() : Object()
+Scoreboard::Scoreboard() : Object()
 {
 	vec4 lighter_color(MakeColor(255, 69, 0, 1.0f));
 	vec4 darker_color = vec4(vec3(lighter_color) /* 2.0f / 3.0f*/, 1.0f);
@@ -17,7 +17,7 @@ Sphere::Sphere() : Object()
 }
 
 
-void Sphere::BuildNormalVisualizationGeometry()
+void Scoreboard::BuildNormalVisualizationGeometry()
 {
 	const float normal_scalar = 0.125f;
 	for (int j = 1; j <= 3; ++j)
@@ -29,34 +29,8 @@ void Sphere::BuildNormalVisualizationGeometry()
 	}
 }
 
-bool Sphere::hit(float time)
-{
-	if(!is_hit)
-	{
-		this->is_hit = true;
-		cout << "is hit" << is_hit;
-	}
-	return true;
-}
 
-float Sphere::getTime()
-{
-	if (!is_hit)
-		return 1.0f;
-	return 0.0f;
-}
-
-vec3 Sphere::getPostion()
-{
-	return this->position;
-}
-
-void Sphere::setPosition(vec3 pos)
-{
-	position = pos;
-}
-
-bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time)
+bool Scoreboard::Initialize()
 {
 	if (this->GLReturnedError("Top::Initialize - on entry"))
 		return false;
@@ -64,191 +38,111 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	if (!super::Initialize())
 		return false;
 
-	if (hit == 0)
-		this->is_hit = false;
-	else
-		this->is_hit = true;
-
-	if (slices < 0)
-		slices = 1;
-
-	this->time = born_time;
-	this->position = position;
-
-	//slices *= 4;
 	mat4 m;
+	int slices = 20;
+	int stacks = 6;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
-	const int stacks_sphere = stacks;
-	//const float radius = 1.0f;
+	const float radius = 0.2f;
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
+	y = 0.0f;
 	vec4 location;
-	vec3 color = RED;
-	if (is_hit)
-		color = GREEN;
+	vec3 color = CYAN;
+	vec3 color2 = WHITE;
+	float height = 5.0f;
 
-	const float increment_stacks = (3.14159f) / float(stacks_sphere);
-	const float increment_slices = (3.14159f) / slices;
+	const float increment_slices = (2 * 3.14159f) / (float)slices;
+	float stack_increment = height/(float)stacks;
 
-	const int mesh_size = slices * stacks;
-	std::vector<VertexAttributesPCN> mesh;
+	VertexAttributesPCN bottomLeft, bottomRight, topLeft, topRight;
 
-	for (int i = 0; i < mesh_size; ++i)
+	for (int i = 0; i <= stacks; i++)
 	{
-		VertexAttributesPCN mesh_temp;
-		mesh.push_back(mesh_temp);
-	}
-
-	//top half
-	for(int i = 0; i < slices; ++i)
-	{
-
-		for(int j = 0; j < stacks_sphere; ++j)
+		for (int j = 0; j < slices; j++)
 		{
-			VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
+			x = radius * cos(phi);
+			//y = height - (height - (i * stack_increment));
+			z = radius * sin(phi);
 			location = vec4(x, y, z, 1.0f);
 
-			cur_bottom_vertex.position = vec3(m * location);
-			cur_bottom_vertex.color = color;
-			cur_bottom_vertex.normal = vec3(normalize(m * location));
+			bottomLeft.position = vec3(location * m);
+			bottomLeft.color = color;
+			bottomLeft.normal = vec3(normalize(location * m));
 
 			phi += increment_slices;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
+			x = radius * cos(phi);
+			z = radius * sin(phi);
 			location = vec4(x, y, z, 1.0f);
 
-			nxt_bottom_vertex.position = vec3(m * location);
-			nxt_bottom_vertex.color = color;
-			nxt_bottom_vertex.normal = vec3(normalize(m * location));
+			bottomRight.position = vec3(location * m);
+			bottomRight.color = color;
+			bottomRight.normal = vec3(normalize(location * m));
 
-			theta += increment_stacks;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
+			y = y + stack_increment;
 			location = vec4(x, y, z, 1.0f);
 
-			nxt_top_vertex.position = vec3(m * location);
-			nxt_top_vertex.color = color;
-			nxt_top_vertex.normal = vec3(normalize(m * location));
+			topRight.position = vec3(location * m);
+			topRight.color = color;
+			topRight.normal = vec3(normalize(location * m));
 
 			phi -= increment_slices;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
+			x = radius * cos(phi);
+			z = radius * sin(phi);
 			location = vec4(x, y, z, 1.0f);
 
-			cur_top_vertex.position = vec3(m * location);
-			cur_top_vertex.color = color;
-			cur_top_vertex.normal = vec3(normalize(m * location));
+			topLeft.position = vec3(location * m);
+			topLeft.color = color;
+			topLeft.normal = vec3(normalize(location * m));
 
-
-			this->vertices.push_back(cur_bottom_vertex);
-			this->vertices.push_back(cur_top_vertex);
-			this->vertices.push_back(nxt_bottom_vertex);
-			this->vertices.push_back(nxt_top_vertex);
+			this->vertices.push_back(bottomLeft);
+			this->vertices.push_back(bottomRight);
+			this->vertices.push_back(topRight);
+			this->vertices.push_back(topLeft);
 
 			this->vertex_indices.push_back(vertices.size() - 1);
 			this->vertex_indices.push_back(vertices.size() - 3);
 			this->vertex_indices.push_back(vertices.size() - 4);
 			
 			this->vertex_indices.push_back(vertices.size() - 1);
-			this->vertex_indices.push_back(vertices.size() - 4);
 			this->vertex_indices.push_back(vertices.size() - 2);
-			
-			mesh.at(i) = cur_top_vertex;
-			mesh.at(i + stacks) = cur_bottom_vertex;
-
-			BuildNormalVisualizationGeometry();
-		
-		}
-		theta = 0.0f;
-		phi += increment_slices;
-
-	}
-	m = rotate(m, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-
-	//bottom half
-	for(int i = 0; i < slices; ++i)
-	{
-
-		for(int j = 0; j < stacks_sphere; ++j)
-		{
-			VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
-			location = vec4(x, y, z, 1.0f);
-
-			cur_bottom_vertex.position = vec3(m * location);
-			cur_bottom_vertex.color = color;
-			cur_bottom_vertex.normal = vec3(normalize(m * location));
+			this->vertex_indices.push_back(vertices.size() - 3);
 
 			phi += increment_slices;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
-			location = vec4(x, y, z, 1.0f);
-
-			nxt_bottom_vertex.position = vec3(m * location);
-			nxt_bottom_vertex.color = color;
-			nxt_bottom_vertex.normal = vec3(normalize(m * location));
-
-			theta += increment_stacks;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
-			location = vec4(x, y, z, 1.0f);
-
-			nxt_top_vertex.position = vec3(m * location);
-			nxt_top_vertex.color = color;
-			nxt_top_vertex.normal = vec3(normalize(m * location));
-
-			phi -= increment_slices;
-
-			x = radius * cos(theta) * sin(phi);
-			y = radius * sin(theta) * sin(phi);
-			z = radius * cos(phi);
-			location = vec4(x, y, z, 1.0f);
-
-			cur_top_vertex.position = vec3(m * location);
-			cur_top_vertex.color = color;
-			cur_top_vertex.normal = vec3(normalize(m * location));
-
-
-			this->vertices.push_back(cur_bottom_vertex);
-			this->vertices.push_back(cur_top_vertex);
-			this->vertices.push_back(nxt_bottom_vertex);
-			this->vertices.push_back(nxt_top_vertex);
-
-			this->vertex_indices.push_back(vertices.size() - 1);
-			this->vertex_indices.push_back(vertices.size() - 2);
-			this->vertex_indices.push_back(vertices.size() - 3);
-			
-			this->vertex_indices.push_back(vertices.size() - 3);
-			this->vertex_indices.push_back(vertices.size() - 2);
-			this->vertex_indices.push_back(vertices.size() - 4);
-			
-			mesh.at(i) = cur_top_vertex;
-			mesh.at(i + stacks) = cur_bottom_vertex;
-
-			BuildNormalVisualizationGeometry();
-		
+			y -= stack_increment;
 		}
-		theta = 0.0f;
-		phi += increment_slices;
-
+		y += stack_increment;
 	}
+
+	bottomLeft.position = vec3(-3.0f, 5.0f, 0.21f);
+	bottomLeft.color = color2;
+	bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	bottomRight.position = vec3(3.0f, 5.0f, 0.21f);
+	bottomRight.color = color2;
+	bottomRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topRight.position = vec3(3.0f, 7.0f, 0.21f);
+	topRight.color = color2;
+	topRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topLeft.position = vec3(-3.0f, 7.0f, 0.21f);
+	topLeft.color = color2;
+	topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(bottomLeft);
+	this->vertices.push_back(bottomRight);
+	this->vertices.push_back(topRight);
+	this->vertices.push_back(topLeft);
+
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 3);
+	this->vertex_indices.push_back(vertices.size() - 4);
+			
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 3);
+
+
 
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
@@ -273,17 +167,15 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 		glBindVertexArray(0);
 	}
 
-	if (shader == 0)
+	
+	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+			return false;
+	
+	/*if(shader == 1)
 	{
-		if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
 			return false;
 	}
-	if(shader == 1)
-	{
-		if (!this->shader.Initialize("blue_shader.vert", "blue_shader.frag"))
-			return false;
-	}
-	/*
 	if(shader == 2)
 	{
 		if(!this->adsShader.Initialize("light.vert", "light.frag"))
@@ -303,12 +195,11 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	if (this->GLReturnedError("Background::Initialize - on exit"))
 		return false;
 
-	is_hit = true;
-
 	return true;
 }
 
-void Sphere::TakeDown()
+
+void Scoreboard::TakeDown()
 {
 	this->vertices.clear();
 	this->shader.TakeDown();
@@ -317,12 +208,12 @@ void Sphere::TakeDown()
 	super::TakeDown();
 }
 
-void Sphere::Draw(const ivec2 & size)
+void Scoreboard::Draw(const ivec2 & size)
 {
 	assert(false);
 }
 
-void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
+void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 {
 	if (this->GLReturnedError("Top::Draw - on entry"))
 		return;
@@ -369,8 +260,6 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
 
 	if (this->GLReturnedError("Top::Draw - on exit"))
 		return;
-
-	//time -= 1E3;
 }
 
 

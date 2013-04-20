@@ -17,7 +17,9 @@ Project3 - Morgan Ludtke & Faiz Lurman
 #include "map.h"
 #include "JumboTron.h"
 #include "Skybox.h"
-//#include "Box2D\Box2D.h"
+#include "Box2D\Box2D.h"
+#include "Obstacle.h"
+#include "Scoreboard.h"
 
 using namespace std;
 using namespace glm;
@@ -48,10 +50,11 @@ public:
 	GLint shader;	//current shader
 	GLint num_balls;	//number of balls on field
 	GLfloat ball_radius;	//radius of the balls on the field
+	GLfloat obstacle_height, obstacle_width;	//dimensions of obstacles on field
 	string title;
 	ivec2 size;
 	GLfloat aspect;
-	vector<string> instructions;
+	vector<string> instructions;	//text on screen
 	vector<string> plus_sign;
 	vector<string> small_screen;
 } window, window2;
@@ -63,12 +66,16 @@ JumboTron tron;	//JumboTrons
 vector<Sphere> balls; //balls
 Skybox sky;
 Sphere baller;
+Obstacle box;
+Scoreboard score;
 
 static GLfloat xrot = 0.0f, yrot = 0.0f; //used for mouse movement
 static GLfloat xdiff = 0.0f, ydiff = 0.0f;	//used for mouse movement (old)
 GLfloat radius, xpos, ypos, zpos;	//used for camera movement
 GLfloat angleH, angleV;	//ditto
-GLfloat lookatX = 0.0f, lookatY = 0.0f, lookatZ = 0.0f;
+GLfloat cameraX, cameraZ;
+GLfloat lookatX = 0.0f, lookatY = 0.0f, lookatZ = 0.0f; //first person camera movement
+
 float PI = 3.1415926f;
 
 bool gameWon = false;
@@ -77,6 +84,11 @@ GLfloat xDiffFromCenter, yDiffFromCenter; //used for mouse movement
 GLint facing_direction = 1;
 
 int debug_mode = 1;	//keeps track of what debug mode it is in
+
+//box2D
+b2BodyDef groundBodyDef;
+b2PolygonShape groundBox;
+b2BodyDef bodyDef;
 
 void DisplayInstructions()
 {
@@ -167,6 +179,8 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	walls.TakeDown();
 	tron.TakeDown();
 	sky.TakeDown();
+	box.TakeDown();
+	score.TakeDown();
 	for (int i = 0; i < balls.size(); i++)
 	{
 		balls.at(i).TakeDown();
@@ -207,11 +221,13 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 		{
 			// Will be leaving paused state
 			window.total_time_paused += (current_time - window.time_last_pause_began);
+			debug_mode = 2;
 		}
 		else
 		{
 			// Will be entering paused state
 			window.time_last_pause_began = current_time;
+			debug_mode = 1;
 		}
 		window.paused = !window.paused;
 		break;
@@ -239,7 +255,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 		++window.slices;
 		++window.stacks;
 		ball.TakeDown();
-		ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime(), ball.getPostion());
+		ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime());
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:	//decreases the number of vertices for all objects
@@ -250,7 +266,7 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 			--window.stacks;
 			window.stacks = clamp(window.stacks, 2, 50);
 			ball.TakeDown();
-			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime(), ball.getPostion());
+			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, ball.getTime());
 			
 		}
 		break;
@@ -325,6 +341,21 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 //
 //}
 
+void Box()
+{
+	b2Vec2 gravity(0.0f, -10.0f);
+	bool doSleep = true;
+	b2World world(gravity); 
+
+	groundBodyDef.position.Set(0.0f, -10.0f);
+	b2Body* groundBody = world.CreateBody(&groundBodyDef);
+	groundBox.SetAsBox(50.0f, 10.0f);
+
+	groundBody->CreateFixture(&groundBox, 0.0f);
+	bodyDef.type = b2_dynamicBody;
+	bodyDef.position.Set(0.0f, 4.0f);
+	b2Body* body = world.CreateBody(&bodyDef);
+}
 
 void DisplayFunc()
 {
@@ -338,11 +369,15 @@ void DisplayFunc()
 
 	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
 
-
 	radius = 20.0f;
 
-	//movement (with a buffer zone in center
-	if (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f)
+	float tempX = xpos;
+	float tempZ = zpos;
+	float tempLookatX = lookatX;
+	float tempLookatZ = lookatZ;
+
+	//movement (with a buffer zone in center) in first person view
+	if (debug_mode != 1 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
 	{
 		//move forward and backwards
 		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.001f);
@@ -362,62 +397,88 @@ void DisplayFunc()
 		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
 	}
 
-	if (!gameWon)
+	//movement in third person view
+	if (debug_mode == 1 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
 	{
-	if (ball.getPostion().x + 1.1 * window.ball_radius >= xpos * 1.1 && ball.getPostion().x - 1.1 * window.ball_radius <= xpos * 1.1)
-	{
-		if (ball.getPostion().z + 1.1 * window.ball_radius >= zpos * 1.1 && ball.getPostion().z - 1.1 * window.ball_radius <= zpos * 1.1)
-		{
-			ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f));
-			//hit();
-			gameWon = true;
-			cout << ball.getTime() << endl;
-			lookatZ = -lookatZ;
-		}	
-	}
+		angleH = angleH - xDiffFromCenter * 0.005f;
+		cameraX = sin(angleH * (PI / 180)) * 110.0f;
+		cameraZ = cos(angleH * (PI / 180)) * 110.0f;
+
 	}
 
-	mat4 modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+
+	//check to see if going to hit a ball
+	for (int i = 0; i < balls.size(); i++)
+	{
+		if (xpos >= (balls.at(i).getPostion().x - window.ball_radius) && (xpos)  <= (balls.at(i).getPostion().x + window.ball_radius))
+		{
+			if (zpos >= (balls.at(i).getPostion().z - window.ball_radius) && (zpos)  <= (balls.at(i).getPostion().z + window.ball_radius))
+				
+				xpos = tempX;
+				zpos = tempZ;
+				//lookatX = tempLookatX;
+				//lookatZ = tempLookatZ;
+				cout << balls.at(i).getPostion().x << ", " << balls.at(i).getPostion().z << ", " << i << endl;
+		}
+	}
+
+
+	mat4 modelview;
+	if (debug_mode == 1)
+	{
+		modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	}
+	else
+	{
+		modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, lookatY, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+		gameWon = false;
+	}
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 
 	sky.Draw(projection, modelview, window.size);
 
+	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	ground.Draw(projection, modelview, window.size);
 	walls.Draw(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
+	//Draw jumbotrons and scoreboards
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
 	tron.Draw(projection, modelview, window.size);
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 214.0f));
-	tron.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	tron.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	score.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	score.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
 
-
-
-	modelview = translate(modelview, vec3(0.0f, -1.0f + window.ball_radius, 0.0f));	//make sure balls are on ground
+	//Draw player (and other objects)
+	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -10.0f));
+	box.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 10.0f));
+	modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
+	modelview = translate(modelview, vec3(xpos, ypos, zpos));
 	ball.Draw(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
-
-	//modelview = translate(modelview, vec3(0.0f, 0.0f, 10.0f));
-	//DisplayFunc2();
-
-	srand (10);		//seed generator
 	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
 	{
-		int rand_int = rand() % 200 - 100;
-		float rand_float = ((float) rand()) / (float) RAND_MAX;
-		float rand_numberX = rand_float + float(rand_int);
-		rand_int = rand() % 200 - 100;
-		rand_float = ((float) rand()) / (float) RAND_MAX;
-		float rand_numberZ = rand_float + float(rand_int);
-
-		modelview = translate(modelview, vec3(rand_numberX, 0.0f, rand_numberZ));	//places in random location
+		modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
 		
-		balls.at(i).Draw(projection, modelview, window.size);
-		//ball.Draw(projection, modelview, window.size);
+		//balls.at(i).Draw(projection, modelview, window.size);
+		ball.Draw(projection, modelview, window.size);
 		//cout << balls.at(i).getTime() << endl;
-		modelview = translate(modelview, vec3(-rand_numberX, 0.0f, -rand_numberZ));
+		modelview = translate(modelview, -balls.at(i).getPostion());
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -428,7 +489,6 @@ void DisplayFunc()
 	glFlush();
 	glutPostRedisplay(); // FPS
 }
-
 
 
 GLvoid TimerFunc(GLint value)	//keeps track of time to be displayed on window
@@ -489,9 +549,9 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 	
 	//cout << "look at z: " << lookatZ << endl;
 	//cout << "look at x:     " << lookatX << endl;
-	cout << "y diff: " << yDiffFromCenter << endl;
+	/*cout << "y diff: " << yDiffFromCenter << endl;
 	cout << "x diff:     " << xDiffFromCenter << endl;
-	cout << "angle: " << angleV << endl;
+	cout << "angle: " << angleV << endl;*/
 
 }
 
@@ -501,10 +561,14 @@ GLint main(GLint argc, GLchar * argv[])
 	xpos = 0.0f;
 	ypos = 0.0f;
 	zpos = 20.0f;
+	cameraX = 0.0f;
+	cameraZ = 110.0f;
 	angleH = 0.0f;
 	angleV = 0.0f;
-	window.num_balls = 20;
+	window.num_balls = 10;
 	window.ball_radius = 1.0f;
+	window.obstacle_height = 2.0f;
+	window.obstacle_width = 3.0f;
 
 	glutInit(&argc, argv);
 	glutInitWindowSize(1300, 960);
@@ -512,9 +576,7 @@ GLint main(GLint argc, GLchar * argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
 
 	//box2D functions
-	//b2Vec2 gravity(0.0f, -10.0f);
-	//bool doSleep = true;
-	//b2World world(gravity); 
+	
 
 	window.handle = glutCreateWindow(window.title.c_str());
 	glutReshapeFunc(ReshapeFunc);
@@ -541,9 +603,9 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(GLEW_OK == glewInit());	
 
 	//initialize all objects, and returns error if failed
-	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
+	if (!ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME))
 		return 0;
-	cout << "ball: " << ball.shader.program_id << endl;
+	//cout << "ball: " << ball.shader.program_id << endl;
 	if (!ground.InitializeFloor())
 		return 0;
 	if (!walls.InitializeWalls())
@@ -552,23 +614,38 @@ GLint main(GLint argc, GLchar * argv[])
 		return 0;
 	if (!sky.Initialize(window.slices, window.stacks))
 		return 0;
+	if (!box.Initialize(window.obstacle_height, window.obstacle_width, window.shader))
+		return 0;
+	if (!score.Initialize())
+		return 0;
 
+
+	srand (5);		//seed generator
 	for (int i = 0; i < window.num_balls; i++)
 	{
 		//Sphere baller;
 		//baller.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f));
 		balls.push_back(baller);
+
+		int rand_int = rand() % 200 - 100;
+		float rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberX = rand_float + float(rand_int);
+		rand_int = rand() % 200 - 100;
+		rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberZ = rand_float + float(rand_int);
+		
+		balls.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
+		cout << balls.at(i).getPostion().x << " hey " << endl;
 	}
 	for (int i = 0; i < balls.size(); i++)
 	{
-		if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
-			return 0;
-		cout << balls.at(i).getTime() << endl;
-		cout << " " << balls.at(i).shader.program_id << endl;
+		//if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME));
+		//	return 0;
+		//cout << balls.at(i).getPosition() << endl;
+		//cout << " " << balls.at(i).shader.program_id << endl;
 	}
-	if (!balls.at(5).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, GLUT_ELAPSED_TIME, vec3(0.0f, 0.0f, 0.0f)))
-		return 0;
-	//cout << balls.at(5).getTime() << " hey" << endl;
+	balls.at(5).setPosition(vec3(0.0f, 0.0f, 0.0f));
+	cout << balls.at(5).getPostion().x << " hey " << endl;
 	//cout << balls.size() << endl;
 	glutMainLoop();
 }

@@ -42,14 +42,14 @@ bool JumboTron::InitializeCylinder()
 	int slices = 20;
 	int stacks = 6;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
-	const float radius = 0.4f;
+	const float radius = 0.2f;
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	y = 0.0f;
 	vec4 location;
 	vec3 color = CYAN;
 	vec3 color2 = WHITE;
-	float height = 5.0f;
+	float height = 7.0f;
 
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
 	float stack_increment = height/(float)stacks;
@@ -113,21 +113,21 @@ bool JumboTron::InitializeCylinder()
 		y += stack_increment;
 	}
 
-	bottomLeft.position = vec3(-5.0f, 5.0f, -0.5f);
+	bottomLeft.position = vec3(-5.0f, 5.0f, 0.21f);
 	bottomLeft.color = color2;
-	bottomLeft.normal = vec3(-5.0f, 5.0f, -1.0f);
+	bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	bottomRight.position = vec3(5.0f, 5.0f, -0.5f);
+	bottomRight.position = vec3(5.0f, 5.0f, 0.21f);
 	bottomRight.color = color2;
-	bottomRight.normal = vec3(5.0f, 5.0f, -1.0f);
+	bottomRight.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	topRight.position = vec3(5.0f, 10.0f, -0.5f);
+	topRight.position = vec3(5.0f, 10.0f, 0.21f);
 	topRight.color = color2;
-	topRight.normal = vec3(5.0f, 10.0f, -1.0f);
+	topRight.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	topLeft.position = vec3(-5.0f, 10.0f, -0.5f);
+	topLeft.position = vec3(-5.0f, 10.0f, 0.21f);
 	topLeft.color = color2;
-	topLeft.normal = vec3(-5.0f, 10.0f, -1.0f);
+	topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
 
 	this->vertices.push_back(bottomLeft);
 	this->vertices.push_back(bottomRight);

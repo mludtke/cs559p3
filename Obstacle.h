@@ -6,14 +6,12 @@
 #include "object.h"
 #include "shader.h"
 
-class Sphere : public Object
+class Obstacle : public Object
 {
 public:
-	Sphere();
+	Obstacle();
 	
-	bool Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time);
-
-	bool hit(float time);
+	bool Initialize(int height, int width, int shader);
 
 	float getTime();
 	glm::vec3 getPostion();
@@ -31,7 +29,6 @@ private:
 	glm::vec4 colors[2];
 	std::vector<VertexAttributesPCN> vertices;
 	typedef Object super;
-	bool is_hit;
 	float time;
 	glm::vec3 position;
 };
