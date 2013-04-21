@@ -1,1 +1,14 @@
-dir_to_ignore/Debug
+# Visual Studio files #
+######################
+Debug/
+*.sdf
+*.opensdf
+*.user
+*.suo
+*.sln
+*.vcxproj
+*.filters
+
+# OS generated files #
+######################
+Thumbs.db
