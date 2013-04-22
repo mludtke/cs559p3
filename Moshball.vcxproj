@@ -97,6 +97,7 @@
     <ClCompile Include="vertexattributes.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="constants.h" />
     <ClInclude Include="fbo.h" />
     <ClInclude Include="JumboTron.h" />
     <ClInclude Include="map.h" />
