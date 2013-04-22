@@ -213,7 +213,7 @@ void Scoreboard::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size)
+void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {
 	if (this->GLReturnedError("Top::Draw - on entry"))
 		return;

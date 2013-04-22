@@ -1,3 +1,12 @@
+/*	Perry Kivolowitz - University of Wisconsin - Madison 
+	Computer Sciences Department
+
+	A sample hello world like program demonstrating modern
+	OpenGL techniques. 
+
+	Created:	2/25/13
+	Updates:
+*/
 
 #pragma once
 #include <glm/glm.hpp>
@@ -6,26 +15,19 @@
 #include "object.h"
 #include "shader.h"
 
-#include "TextureManager.h"
-#include "texturedshader.h"
 class Skybox : public Object
 {
 public:
 	Skybox();
-	
-	bool Initialize(int slices, int stacks);
-
+	bool Initialize();
 	virtual void Draw(const glm::ivec2 & size);
-	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
+	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, const float time = 0);
 	void TakeDown();
-	Shader shader;
-	ADSShader adsShader;
-	Shader solid_color;
+  TexturedShader shader;
+	Shader solid_color;  
 
 private:
-	void BuildNormalVisualizationGeometry();
-	glm::vec4 colors[2];
-	std::vector<VertexAttributesPCN> vertices;
+	void BuildNormalVisualizationGeometry();	
+	std::vector<VertexAttributesPCNT> vertices;
 	typedef Object super;
-	float time;
 };

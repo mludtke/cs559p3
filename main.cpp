@@ -758,7 +758,7 @@ GLint main(GLint argc, GLchar * argv[])
 		return 0;
 	if (!tron.InitializeCylinder())
 		return 0;
-	if (!sky.Initialize(window.slices, window.stacks))
+	if (!sky.Initialize())
 		return 0;
 	if (!box.Initialize(window.obstacle_height, window.obstacle_width, window.shader))
 		return 0;
@@ -799,5 +799,8 @@ GLint main(GLint argc, GLchar * argv[])
 	balls.at(5).setPosition(vec3(0.0f, 0.0f, 0.0f));
 	cout << balls.at(5).getPostion().x << " hey " << endl;
 	//cout << balls.size() << endl;
+
+	assert(TextureManager::Inst()->LoadTexture((const char *) "stone.jpg", 0));
+
 	glutMainLoop();
 }

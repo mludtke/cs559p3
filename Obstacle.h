@@ -18,7 +18,7 @@ public:
 	void setPosition(glm::vec3 pos);
 
 	virtual void Draw(const glm::ivec2 & size);
-	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
+	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, const float time = 0);
 	void TakeDown();
 	Shader shader;
 	ADSShader adsShader;
@@ -29,6 +29,6 @@ private:
 	glm::vec4 colors[2];
 	std::vector<VertexAttributesPCN> vertices;
 	typedef Object super;
-	float time;
+	//float time;
 	glm::vec3 position;
 };

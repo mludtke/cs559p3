@@ -20,7 +20,7 @@ public:
 	void setPosition(glm::vec3 pos);
 
 	virtual void Draw(const glm::ivec2 & size);
-	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
+	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, const float time = 0);
 	void TakeDown();
 	Shader shader;
 	ADSShader adsShader;

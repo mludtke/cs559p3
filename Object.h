@@ -17,17 +17,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "vertexattributes.h"
+#include "constants.h"
+#include "TextureManager.h"
 
-// Colors
-const glm::vec3 RED(1.0f, 0.0f, 0.0f);
-const glm::vec3 GREEN(0.0f, 1.0f, 0.0f);
-const glm::vec3 BLUE(0.0f, 0.0f, 1.0f);
-const glm::vec3 YELLOW(1.0f, 1.0f, 0.0f);
-const glm::vec3 CYAN(0.0f, 1.0f, 1.0f);
-const glm::vec3 MAGENTA(1.0f, 0.0f, 1.0f);
-const glm::vec3 BLACK(0.0f, 0.0f, 0.0f);
-const glm::vec3 GRAY(0.5f, 0.5f, 0.5f);
-const glm::vec3 WHITE(1.0f, 1.0f, 1.0f);
 
 class Object
 {
@@ -38,7 +30,7 @@ public:
 	virtual bool Initialize();
 	virtual bool PostGLInitialize(GLuint * vertex_array_handle, GLuint * vertex_coordinate_handle, GLsizeiptr sz, const GLvoid * ptr);
 
-	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size) = 0;
+	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, const float time = 0) = 0;
 	virtual ~Object();
 
 	inline void EnableNormals(bool dn) { this->draw_normals = dn; } 
