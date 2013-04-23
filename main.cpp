@@ -800,7 +800,8 @@ GLint main(GLint argc, GLchar * argv[])
 	cout << balls.at(5).getPostion().x << " hey " << endl;
 	//cout << balls.size() << endl;
 
-	assert(TextureManager::Inst()->LoadTexture((const char *) "stone.jpg", 0));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "simpson_skybox.jpg", 0));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "crate.jpg", 1));
 
 	glutMainLoop();
 }

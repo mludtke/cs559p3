@@ -37,24 +37,28 @@ bool Skybox::Initialize()
   //          v12 ---- v13
   //==================== CubeMap ======================// 
   mat4 MV(1.0f);
-  //MV = scale(MV, vec3(10.0f,10.0f,10.0f));
-  //MV = rotate(MV, 90.0f, vec3(0.0f,1.0f,0.0f));  
+  //MV = scale(MV, vec3(10.0f, 10.0f, 10.0f));
+  //MV = rotate(MV, 90.0f, vec3(0.0f,1.0f,0.0f)); 
+  float height_top = 120.0f;
+  float height_bottom = -120.0f;
+  float width = 200.0f;
+
   vec3 position;
   VertexAttributesPCNT cubeMap[14];
-  cubeMap[0].position = vec3(-1.0f,0.0f,0.0f);
-  cubeMap[1].position = vec3(0.0f,0.0f,0.0f);
-  cubeMap[2].position = vec3(1.0f,0.0f,0.0f);
-  cubeMap[3].position = vec3(2.0f,0.0f,0.0f);
-  cubeMap[4].position = vec3(3.0f,0.0f,0.0f);
-  cubeMap[5].position = vec3(-1.0f,1.0f,0.0f);
-  cubeMap[6].position = vec3(0.0f,1.0f,0.0f);
-  cubeMap[7].position = vec3(1.0f,1.0f,0.0f);
-  cubeMap[8].position = vec3(2.0f,1.0f,0.0f);
-  cubeMap[9].position = vec3(3.0f,1.0f,0.0f);
-  cubeMap[10].position = vec3(0.0f,2.0f,0.0f);
-  cubeMap[11].position = vec3(1.0f,2.0f,0.0f);
-  cubeMap[12].position = vec3(0.0f,-1.0f,0.0f);
-  cubeMap[13].position = vec3(1.0f,-1.0f,0.0f);
+  cubeMap[0].position = vec3(-width,height_bottom,width);
+  cubeMap[1].position = vec3(-width,height_bottom,-width);
+  cubeMap[2].position = vec3(width,height_bottom,-width);
+  cubeMap[3].position = vec3(width,height_bottom,width);
+  cubeMap[4].position = vec3(-width,height_bottom,width);
+  cubeMap[5].position = vec3(-width,height_top,width);
+  cubeMap[6].position = vec3(-width,height_top,-width);
+  cubeMap[7].position = vec3(width,height_top,-width);
+  cubeMap[8].position = vec3(width,height_top,width);
+  cubeMap[9].position = vec3(-width,height_top,width);
+  cubeMap[10].position = vec3(-width,height_top,width);
+  cubeMap[11].position = vec3(width,height_top,width);
+  cubeMap[12].position = vec3(-width,height_bottom,width);
+  cubeMap[13].position = vec3(width,height_bottom,width);
 
   for (int i = 0; i < 14; i++)
     cubeMap[i].position = vec3(MV * vec4(cubeMap[i].position, 1.0f));
@@ -269,9 +273,8 @@ void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, c
   mat4 mvp = projection * modelview;
   mat3 nm = inverse(transpose(mat3(modelview)));
 
-  TextureManager::Inst()->BindTexture(2,0);
+  TextureManager::Inst()->BindTexture(0,0);
 
-  //	The current "TextureManager" that comes with FreeImage is quite dumb.
 	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
 	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
 	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_CLAMP);
