@@ -11,7 +11,7 @@ class Sphere : public Object
 public:
 	Sphere();
 	
-	bool Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time);
+	bool Initialize(int slices, int stacks, float radius, int shader, int hit, float born_time);
 
 	bool hit(float time);
 

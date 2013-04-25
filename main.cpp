@@ -53,6 +53,7 @@ public:
 	GLint num_balls;	//number of balls on field
 	GLfloat ball_radius;	//radius of the balls on the field
 	GLfloat obstacle_height, obstacle_width;	//dimensions of obstacles on field
+	GLint num_boxes;	//number of obstacles on field
 	string title;
 	ivec2 size;
 	GLfloat aspect;
@@ -66,8 +67,10 @@ Sphere ball;
 Map ground, walls, cursor;	//map objects
 JumboTron tron;	//JumboTrons
 vector<Sphere> balls; //balls
+vector<Obstacle> boxes;
 Skybox sky;
 Sphere baller;
+Obstacle crate;
 Obstacle box;
 Scoreboard score;
 FrameBufferObject fbo;
@@ -109,7 +112,7 @@ void DisplayInstructions()
 	glViewport(0, 0, window.size.x, window.size.y);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslated(10, 15 * s->size(), -5.5);
+	glTranslated(window.size.x - 300, 15 * s->size(), -5.5);
 	glScaled(0.1, 0.1, 1.0);
 	for (auto i = s->begin(); i < s->end(); ++i)
 	{
@@ -208,7 +211,7 @@ void Axes()
 	gluDeleteQuadric(q);
 }
 
-void RenderIntoFrameBuffer()
+void RenderIntoFrameBuffer(mat4 m, mat4 p)
 {
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
@@ -240,24 +243,33 @@ void RenderIntoFrameBuffer()
 	glPopMatrix();
 	glPopAttrib();
 	fbo.Unbind();
+
+	//fbo.Bind();
+	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
+
+	////glViewport(0, 0, fbo.size.x, fbo.size.y);
+	//ball.Draw(p, m, fbo.size);
+
+	//fbo.Unbind();
+	
 }
-
-
 
 
 void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 {
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
-	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(15, 10.0/5.0, 1, 10);
 	//glViewport(0, 0, window.size.x/2.0, window.size.y/2.0);
 	glMatrixMode(GL_MODELVIEW);
-	ball.Draw(p, m, window.size);
+	//ball.Draw(p, m, window.size);
 	glLoadIdentity();
 	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
 	//glRotatef(time * 30.0f, 0.0f, 1.0f, 0.0f);
@@ -277,6 +289,27 @@ void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
+
+	////glViewport(0, 0, window.size.x/2.0, window.size.y/2.0);
+	////ball.Draw(p, m, window.size);
+	//glLoadIdentity();
+	////glRotatef(time * 30.0f, 0.0f, 1.0f, 0.0f);
+	//glRotatef(-30, 1.0f, 0.0f, 0.0f);
+	//Axes();
+	//glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+	//glEnable(GL_TEXTURE_2D);
+	//glBegin(GL_QUADS);
+	//glTexCoord2f(0.0f, 0.0f);
+	//glVertex2f(-0.5f, -0.5f);
+	//glTexCoord2f(1.0f, 0.0f);
+	//glVertex2f(0.5f, -0.5f);
+	//glTexCoord2f(1.0f, 1.0f);
+	//glVertex2f(0.5f, 0.5f);
+	//glTexCoord2f(0.0f, 1.0f);
+	//glVertex2f(-0.5f, 0.5f);
+	//glEnd();
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	//glDisable(GL_TEXTURE_2D);
 }
 
 
@@ -292,10 +325,6 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	sky.TakeDown();
 	box.TakeDown();
 	score.TakeDown();
-	for (int i = 0; i < balls.size(); i++)
-	{
-		balls.at(i).TakeDown();
-	}
 
 	cout << " Elapsed Time: " << GLfloat(glutGet(GLUT_ELAPSED_TIME)) / 1E3 << "s" << endl;
 	if (gameWon)
@@ -418,11 +447,11 @@ void DisplayFunc2()
 
 	glDisable(GL_CULL_FACE);
 
-	//glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, window.size.x/4, window.size.y/4);
 
-	mat4 projection = perspective(30.0f, window.aspect, 1.0f, 600.0f);
+	mat4 projection = perspective(35.0f, window.aspect, 1.0f, 600.0f);
 
 	radius = 20.0f;
 
@@ -432,7 +461,9 @@ void DisplayFunc2()
 	float tempLookatZ = lookatZ;
 
 	mat4 modelview;
-	modelview = lookAt(vec3(0.0f, 250.0f, 0.01f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	modelview = rotate(modelview, -90.0f, vec3(1.0f, 0.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 300.0f, 0.0f));
+	//modelview = lookAt(vec3(0.0f, 250.0f, 0.00f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 
@@ -478,7 +509,7 @@ void DisplayFunc2()
 	ball.Draw(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
-	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
+	for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
 	{
 		modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
 		
@@ -488,6 +519,15 @@ void DisplayFunc2()
 		modelview = translate(modelview, -balls.at(i).getPostion());
 	}
 
+	for (int i = 0; i < (int)boxes.size(); i++)	//places the desired number of obstacles on field
+	{
+		modelview = translate(modelview, boxes.at(i).getPostion());	//places in random location
+		
+		//balls.at(i).Draw(projection, modelview, window.size);
+		box.Draw(projection, modelview, window.size);
+		//cout << balls.at(i).getTime() << endl;
+		modelview = translate(modelview, -boxes.at(i).getPostion());
+	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -495,11 +535,31 @@ void DisplayFunc2()
 	glutPostRedisplay(); // FPS
 }
 
+Obstacle Object_movement(Obstacle obst, vec3 obj_pos, float force, vec3 direction)
+{
+	float moved_X = obst.getPostion().x + direction.x * force * 0.01f;
+	float moved_Z = obst.getPostion().z + direction.z * force * 0.01f;
+
+	obst.setPosition(vec3(moved_X, ypos, moved_Z));
+
+	float force2 = force;
+	force2 -= 0.01f;
+	force2 = clamp(force2, 0.0f, 10.0f);
+	obst.setForce(force2);
+
+	if (force > 0.0f)
+	{
+		cout << force << endl;
+		cout << "direction " << direction.x << ", " << direction.z << endl;
+		cout << "position " << obj_pos.x << ", " << obj_pos.z << endl;
+	}
+
+	return obst;
+}
+
 void DisplayFunc()
 {
 	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
-
-	
 
 	glDisable(GL_CULL_FACE);
 
@@ -519,22 +579,36 @@ void DisplayFunc()
 	//movement (with a buffer zone in center) in first person view
 	if (debug_mode != 1 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
 	{
+
+		if (xpos <= -102.5f || xpos >= 102.5f)	//bounce off walls
+		{
+			lookatX = xpos - (lookatX - xpos);
+			angleV = -angleV;
+		}
+		if (zpos <= -102.5f || zpos >= 102.5f)	//bounce off walls
+		{
+			//lookatX = xpos - (lookatX - xpos);
+			lookatZ = zpos - (lookatZ - zpos);
+			angleV = -angleV;
+		}
+
 		//move forward and backwards
-		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.001f);
-		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.001f);
+		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.002f);
+		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.002f);
 		ypos = ypos + ((0 - ypos) * 0.003f);
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
+		/*lookatX = xpos - sin(angleV * (PI / 180)) * radius;
 		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-		lookatY = ypos;
+		lookatY = ypos;*/
 		
-		zpos = clamp(zpos, -104.0f, 104.0f);
-		xpos = clamp(xpos, -104.0f, 104.0f);
+		zpos = clamp(zpos, -103.0f, 103.0f);
+		xpos = clamp(xpos, -103.0f, 103.0f);
 
 		// turn right or left
-		angleV = angleV - xDiffFromCenter * 0.005f;
+		angleV = angleV - xDiffFromCenter * 0.01f;
 		lookatY = lookatY;
 		lookatX = xpos - sin(angleV * (PI / 180)) * radius;
 		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+
 	}
 
 	//movement in third person view
@@ -546,20 +620,40 @@ void DisplayFunc()
 
 	}
 
-	//check to see if going to hit a ball
-	//for (int i = 0; i < balls.size(); i++)
-	//{
-	//	if (xpos >= (balls.at(i).getPostion().x - window.ball_radius) && (xpos)  <= (balls.at(i).getPostion().x + window.ball_radius))
-	//	{
-	//		if (zpos >= (balls.at(i).getPostion().z - window.ball_radius) && (zpos)  <= (balls.at(i).getPostion().z + window.ball_radius))
-	//			
-	//			xpos = tempX;
-	//			zpos = tempZ;
-	//			//lookatX = tempLookatX;
-	//			//lookatZ = tempLookatZ;
-	//			cout << balls.at(i).getPostion().x << ", " << balls.at(i).getPostion().z << ", " << i << endl;
-	//	}
-	//}
+	//check to see if going to hit a box and calculate position
+	for (int i = 0; i < (int)boxes.size(); i++)
+	{
+		if (xpos >= (boxes.at(i).getPostion().x - window.obstacle_width/2.0f) && (xpos)  <= (boxes.at(i).getPostion().x + window.obstacle_width/2.0f))
+		{
+			if (zpos >= (boxes.at(i).getPostion().z - window.obstacle_width/2.0f) && (zpos)  <= (boxes.at(i).getPostion().z + window.obstacle_width/2.0f))
+			{	
+				//xpos = tempX;
+				//zpos = tempZ;
+				//lookatX = tempLookatX;
+				//lookatZ = tempLookatZ;
+			
+				boxes.at(i).setForce(yDiffFromCenter);
+				float direction_X; 
+				direction_X = boxes.at(i).getPostion().x - xpos;
+				float direction_Z; 
+				direction_X = boxes.at(i).getPostion().z - zpos;
+				boxes.at(i).setDirection(vec3(direction_X, ypos, direction_Z));
+
+				cout << boxes.at(i).getPostion().x << ", " << boxes.at(i).getPostion().z << ", " << i << endl;
+				cout << "Force: " << boxes.at(i).getForce() << endl;
+				cout << "direction: " << boxes.at(i).getDirection().x << ", " << boxes.at(i).getDirection().z << endl;
+
+				if (yDiffFromCenter > 0)	//rotate around if hit head one
+				{
+					lookatX = xpos - (lookatX - xpos);
+					lookatZ = zpos - (lookatZ - zpos);
+					angleV = -angleV;
+					cout << "yo" << endl;
+				}
+			}
+		}
+		boxes.at(i) = Object_movement(boxes.at(i), boxes.at(i).getPostion(), boxes.at(i).getForce(), boxes.at(i).getDirection()); 
+	}
 
 	mat4 modelview;
 	if (debug_mode == 1)
@@ -578,7 +672,7 @@ void DisplayFunc()
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	ground.Draw(projection, modelview, window.size);
-	walls.Draw(projection, modelview, window.size);
+	walls.Draw_walls(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
 	//Draw jumbotrons and scoreboards
@@ -586,10 +680,12 @@ void DisplayFunc()
 	tron.Draw(projection, modelview, window.size);
 	//framebuffer testing
 	//glEnable(GL_DEPTH_TEST);
-	/*RenderIntoFrameBuffer();
+	/*modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));
+	RenderIntoFrameBuffer(modelview, projection);
 	UseFramebufferToDrawSomething(modelview, projection);
-	glViewport(0, 0, window.size.x, window.size.y);*/
-	
+	glViewport(0, 0, window.size.x, window.size.y);
+	modelview = translate(modelview, vec3(0.0f, -5.0f, 0.0f));*/
+
 	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
 	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
@@ -615,7 +711,7 @@ void DisplayFunc()
 	ball.Draw(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
-	for (int i = 0; i < balls.size(); i++)	//places the desired number of balls on field
+	for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
 	{
 		modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
 		
@@ -623,6 +719,14 @@ void DisplayFunc()
 		ball.Draw(projection, modelview, window.size);
 		//cout << balls.at(i).getTime() << endl;
 		modelview = translate(modelview, -balls.at(i).getPostion());
+	}
+	
+	modelview = translate(modelview, vec3(0.0f, -window.ball_radius, 0.0f));
+	for (int i = 0; i < (int)boxes.size(); i++)	//places the desired number of obstacles on field
+	{
+		modelview = translate(modelview, boxes.at(i).getPostion());	//places in random location
+		box.Draw(projection, modelview, window.size);
+		modelview = translate(modelview, -boxes.at(i).getPostion());
 	}
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -703,6 +807,7 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 
 GLint main(GLint argc, GLchar * argv[])
 {
+	//initial values
 	radius = 20.0f;
 	xpos = 0.0f;
 	ypos = 0.0f;
@@ -714,21 +819,18 @@ GLint main(GLint argc, GLchar * argv[])
 	window.num_balls = 10;
 	window.ball_radius = 1.0f;
 	window.obstacle_height = 2.0f;
-	window.obstacle_width = 3.0f;
+	window.obstacle_width = 2.0f;
+	window.num_boxes = 5;
 
 	glutInit(&argc, argv);
 	glutInitWindowSize(1300, 960);
 	glutInitWindowPosition(500, 100);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
-
-	//box2D functions
 	
-
 	window.handle = glutCreateWindow(window.title.c_str());
 	glutReshapeFunc(ReshapeFunc);
 	glutCloseFunc(CloseFunc); // our takedown actions
 	glutDisplayFunc(DisplayFunc);
-
 
 	glutPassiveMotionFunc(passiveMotionFunc);	//detect mouse movement
 	glutSetCursor(GLUT_CURSOR_UP_DOWN);
@@ -772,7 +874,7 @@ GLint main(GLint argc, GLchar * argv[])
 	}
 
 
-	srand (5);		//seed generator
+	srand (0);		//seed generator
 	for (int i = 0; i < window.num_balls; i++)
 	{
 		//Sphere baller;
@@ -789,7 +891,7 @@ GLint main(GLint argc, GLchar * argv[])
 		balls.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
 		cout << balls.at(i).getPostion().x << " hey " << endl;
 	}
-	for (int i = 0; i < balls.size(); i++)
+	for (int i = 0; i < (int)balls.size(); i++)
 	{
 		//if (!balls.at(i).Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, GLUT_ELAPSED_TIME));
 		//	return 0;
@@ -797,11 +899,31 @@ GLint main(GLint argc, GLchar * argv[])
 		//cout << " " << balls.at(i).shader.program_id << endl;
 	}
 	balls.at(5).setPosition(vec3(0.0f, 0.0f, 0.0f));
-	cout << balls.at(5).getPostion().x << " hey " << endl;
+
+	for (int i = 0; i < window.num_boxes; i++)
+	{
+		boxes.push_back(crate);
+		int rand_int = rand() % 200 - 100;
+		float rand_numberX = float(rand_int);
+		rand_int = rand() % 200 - 100;
+		float rand_numberZ = float(rand_int);
+
+		boxes.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
+		boxes.at(i).setForce(0.0f);
+		boxes.at(i).setDirection(vec3(0.0f, 0.0f, 0.0f));
+	}
 	//cout << balls.size() << endl;
 
-	assert(TextureManager::Inst()->LoadTexture((const char *) "simpson_skybox.jpg", 0));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "crate.jpg", 1));
+	//skybox textures
+	assert(TextureManager::Inst()->LoadTexture((const char *) "simpson_skybox.jpg", 1));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "lava.jpg", 2));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "cubemap.jpg", 3));
+	
+	//object textures
+	assert(TextureManager::Inst()->LoadTexture((const char *) "crate.jpg", 0));
+
+	//map textures
+	assert(TextureManager::Inst()->LoadTexture((const char *) "advertisments.jpg", 4));
 
 	glutMainLoop();
 }

@@ -31,7 +31,7 @@ void Map::BuildNormalVisualizationGeometry()
 
 bool Map::InitializeFloor()
 {
-	if (this->GLReturnedError("Top::Initialize - on entry"))
+	if (this->GLReturnedError("Floor::Initialize - on entry"))
 		return false;
 
 	if (!super::Initialize())
@@ -40,7 +40,7 @@ bool Map::InitializeFloor()
 	mat4 m;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
 
-	const float height = 210.0f;
+	const float height = 210.0f;	//mile in modelview coordinates
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
@@ -60,7 +60,7 @@ bool Map::InitializeFloor()
 	{
 		for (int j = 0; j < steps; j++)
 		{
-			VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
+			VertexAttributesPCNT cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
 		
 			location = vec4(x, y, z, 1.0f);
 			cur_bottom_vertex.position = vec3(m * location);
@@ -107,33 +107,19 @@ bool Map::InitializeFloor()
 		z = z - increment;
 	}
 
-/*	for (int i = 0; i < mesh.size(); ++i)
-	{
-		VertexAttributesPCN mesh_temp;
-		int left, right, up, down, left_up, right_up, left_down, right_down;
-		left = i - 1;
-		right = i + 1;
-		up = i - stacks;
-		down = i + stacks;
-		left_up = i - stacks - 1;
-		right_up = i - stacks + 1;
-		left_down = i + stacks - 1;
-		right_down = i + stacks + 1;
-
-		mesh.at(i).normal = normalize(mesh.at(i).position);
 
 
-	}*/
+	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCNT), &this->vertices[0]))
+		return false;  
 
-	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
-		return false;
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	// Note offset - legacy of older code
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 1));	// Same
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -173,14 +159,14 @@ bool Map::InitializeFloor()
 	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
 */
-	if (this->GLReturnedError("Background::Initialize - on exit"))
+	if (this->GLReturnedError("Floor::Initialize - on exit"))
 		return false;
 	return true;
 }
 
 bool Map::InitializeWalls()
 {
-	if (this->GLReturnedError("Top::Initialize - on entry"))
+	if (this->GLReturnedError("Walls::Initialize - on entry"))
 		return false;
 
 	if (!super::Initialize())
@@ -198,7 +184,7 @@ bool Map::InitializeWalls()
 	vec3 normal_floor = vec3(0.0f, 1.0f, 0.0f);
 
 	//create the wall (wall one)
-	VertexAttributesPCN cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
+	VertexAttributesPCNT cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
 	x = -105.0f;
 	y = 2.0f;
 	z = -105.0f;
@@ -225,6 +211,11 @@ bool Map::InitializeWalls()
 	cur_bottom_vertex.position = vec3(m * location);
 	cur_bottom_vertex.color = color2;
 	cur_bottom_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
+
+	cur_top_vertex.texture_coordinate = vec2(0.00f, 1.00f);
+	nxt_top_vertex.texture_coordinate = vec2(1.00f, 1.00f);
+	cur_bottom_vertex.texture_coordinate = vec2(0.00f, 0.00f);
+	nxt_bottom_vertex.texture_coordinate = vec2(1.00f, 0.00f);
 
 	this->vertices.push_back(cur_top_vertex);
 	this->vertices.push_back(cur_bottom_vertex);
@@ -363,17 +354,20 @@ bool Map::InitializeWalls()
 	this->vertex_indices.push_back(vertices.size() - 4);
 
 
-	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
-		return false;
+	
+  if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCNT), &this->vertices[0]))
+    return false;  
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	// Note offset - legacy of older code
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 1));	// Same
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(3);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 	if (this->normal_vertices.size() > 0)
 	{
@@ -386,89 +380,18 @@ bool Map::InitializeWalls()
 		glBindVertexArray(0);
 	}
 
-	
-	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;
-	
-	/*if(shader == 1)
-	{
-		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
-			return false;
-	}
-	if(shader == 2)
-	{
-		if(!this->adsShader.Initialize("light.vert", "light.frag"))
-			return false;
-		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			//return false;
-	}
-	if(shader == 3)
-	{
-		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			return false;
-	}
+	if (!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
+		return false;
 
 	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
-			return false;
-*/
-	if (this->GLReturnedError("Background::Initialize - on exit"))
+		return false;
+
+	if (this->GLReturnedError("Walls::Initialize - on exit"))
 		return false;
 	return true;
 }
 
-bool Map::InitializeCursor()
-{
-	if (this->GLReturnedError("World::Initialize - on entry"))
-		return false;
 
-	if (!super::Initialize())
-		return false;	
-
-	//creates a cursor
-	//==============================================
-	VertexAttributesPCN  yAxisBottom, xAxisRight, yAxisTop, xAxisLeft;			
-	yAxisTop.position  = vec3(0.0f, 0.25f, 0.0f);
-	yAxisTop.color     = WHITE;
-	xAxisRight.position  = vec3(0.25f, 0.0f, 0.0f);
-	xAxisRight.color     = WHITE;
-	yAxisBottom.position = vec3(0.0f, -0.25f, 0.0f);
-	yAxisBottom.color    = WHITE;
-	xAxisLeft.position  = vec3(-0.25f, 0.0f, 0.0f);
-	xAxisLeft.color    = WHITE;
-
-	vertices.push_back(yAxisTop);
-	vertices.push_back(yAxisBottom);
-	vertices.push_back(xAxisRight);
-	vertices.push_back(xAxisLeft);
-
-	// y-axis
-	vertex_indices.push_back(vertices.size() - 1);
-	vertex_indices.push_back(vertices.size() - 2);
-	// x-axis
-	vertex_indices.push_back(vertices.size() - 3);
-	vertex_indices.push_back(vertices.size() - 4);
-	//==============================================
-	
-
-	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
-		return false;
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 1));	
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	assert(this->shader.Initialize("phong_shader.vert", "phong_shader.frag"));
-
-	if (this->GLReturnedError("World::Initialize - on exit"))
-		return false;
-
-	return true;
-}
 
 void Map::TakeDown()
 {
@@ -486,7 +409,7 @@ void Map::Draw(const ivec2 & size)
 
 void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {
-	if (this->GLReturnedError("Top::Draw - on entry"))
+	if (this->GLReturnedError("Floor::Draw - on entry"))
 		return;
 
 	glEnable(GL_DEPTH_TEST);
@@ -529,31 +452,49 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, cons
 		glUseProgram(0);
 	}
 
-	if (this->GLReturnedError("Top::Draw - on exit"))
+	if (this->GLReturnedError("Floor::Draw - on exit"))
 		return;
 }
 
-void Map::DrawCursor(const mat4 & projection, mat4 modelview, const ivec2 & size)
+
+void Map::Draw_walls(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {
-	if (this->GLReturnedError("World::Draw - on entry"))
-		return;
+	if (this->GLReturnedError("walls::Draw - on entry"))
+    return;
 
-	glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 
-	mat4 mvp = projection * modelview;
-	mat3 nm = inverse(transpose(mat3(modelview)));
+  modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
+  mat4 mvp = projection * modelview;
+  mat3 nm = inverse(transpose(mat3(modelview)));
 
-	shader.Use();
-	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-	glBindVertexArray(this->vertex_array_handle);
-	glLineWidth(1.5f);
-	glDrawElements(GL_LINES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
-	glLineWidth(1.0f);
-	glBindVertexArray(0);
-	glUseProgram(0);	
+  TextureManager::Inst()->BindTexture(4,0);	//Bind it to the crate texture
 
-	if (this->GLReturnedError("World::Draw - on exit"))
-		return;
+	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR);
+
+  shader.Use();
+  shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+  glBindVertexArray(this->vertex_array_handle);
+  glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
+  glBindVertexArray(0);
+  glUseProgram(0);
+
+  if (this->draw_normals)
+  {    
+    this->solid_color.Use();
+    this->solid_color.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+    glBindVertexArray(this->normal_array_handle);
+    glDrawElements(GL_LINES , this->normal_indices.size(), GL_UNSIGNED_INT , &this->normal_indices[0]);
+    glBindVertexArray(0);
+    glUseProgram(0);
+  }
+
+  if (this->GLReturnedError("walls::Draw - on exit"))
+    return;
 }
 
 

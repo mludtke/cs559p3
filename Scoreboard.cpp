@@ -32,7 +32,7 @@ void Scoreboard::BuildNormalVisualizationGeometry()
 
 bool Scoreboard::Initialize()
 {
-	if (this->GLReturnedError("Top::Initialize - on entry"))
+	if (this->GLReturnedError("Scoreboard::Initialize - on entry"))
 		return false;
 
 	if (!super::Initialize())
@@ -192,7 +192,7 @@ bool Scoreboard::Initialize()
 	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
 */
-	if (this->GLReturnedError("Background::Initialize - on exit"))
+	if (this->GLReturnedError("Scoreboard::Initialize - on exit"))
 		return false;
 
 	return true;
@@ -215,7 +215,7 @@ void Scoreboard::Draw(const ivec2 & size)
 
 void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {
-	if (this->GLReturnedError("Top::Draw - on entry"))
+	if (this->GLReturnedError("Scoreboard::Draw - on entry"))
 		return;
 
 	glEnable(GL_DEPTH_TEST);
@@ -258,7 +258,7 @@ void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & siz
 		glUseProgram(0);
 	}
 
-	if (this->GLReturnedError("Top::Draw - on exit"))
+	if (this->GLReturnedError("Scoreboard::Draw - on exit"))
 		return;
 }
 

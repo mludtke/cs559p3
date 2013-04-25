@@ -12,3 +12,4 @@ Debug/
 # OS generated files #
 ######################
 Thumbs.db
+/Debug

@@ -56,9 +56,9 @@ void Sphere::setPosition(vec3 pos)
 	position = pos;
 }
 
-bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit, int born_time)
+bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hit, float born_time)
 {
-	if (this->GLReturnedError("Top::Initialize - on entry"))
+	if (this->GLReturnedError("Sphere::Initialize - on entry"))
 		return false;
 
 	if (!super::Initialize())
@@ -300,7 +300,7 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
 */
-	if (this->GLReturnedError("Background::Initialize - on exit"))
+	if (this->GLReturnedError("Sphere::Initialize - on exit"))
 		return false;
 
 	is_hit = true;
@@ -324,7 +324,7 @@ void Sphere::Draw(const ivec2 & size)
 
 void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {
-	if (this->GLReturnedError("Top::Draw - on entry"))
+	if (this->GLReturnedError("Sphere::Draw - on entry"))
 		return;
 
 	glEnable(GL_DEPTH_TEST);
@@ -367,7 +367,7 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, c
 		glUseProgram(0);
 	}
 
-	if (this->GLReturnedError("Top::Draw - on exit"))
+	if (this->GLReturnedError("Sphere::Draw - on exit"))
 		return;
 
 	//time -= 1E3;
