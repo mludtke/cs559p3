@@ -39,8 +39,8 @@ bool Skybox::Initialize()
   mat4 MV(1.0f);
   //MV = scale(MV, vec3(10.0f, 10.0f, 10.0f));
   //MV = rotate(MV, 90.0f, vec3(0.0f,1.0f,0.0f)); 
-  float height_top = 120.0f;
-  float height_bottom = -120.0f;
+  float height_top = 110.0f;
+  float height_bottom = -90.0f;
   float width = 200.0f;
 
   vec3 position;
@@ -261,7 +261,7 @@ void Skybox::Draw(const ivec2 & size)
   assert(false);
 }
 
-void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
+void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint texture, const float time)
 {
   if (this->GLReturnedError("Skybox::Draw - on entry"))
     return;
@@ -273,7 +273,7 @@ void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, c
   mat4 mvp = projection * modelview;
   mat3 nm = inverse(transpose(mat3(modelview)));
 
-  TextureManager::Inst()->BindTexture(2,0);
+  TextureManager::Inst()->BindTexture(texture, 0);
 
 	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
 	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP_TO_EDGE);

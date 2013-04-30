@@ -1,5 +1,3 @@
-/*	This code is suspect. Use with caution - PSK
-*/
 
 //**********************************************
 //Singleton Texture Manager class

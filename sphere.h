@@ -13,14 +13,16 @@ public:
 	
 	bool Initialize(int slices, int stacks, float radius, int shader, int hit, float born_time);
 
-	bool hit(float time);
+	void hit(float time);
+	bool is_sphere_hit();
 
 	float getTime();
+	void setTime(float t);
 	glm::vec3 getPostion();
 	void setPosition(glm::vec3 pos);
 
 	virtual void Draw(const glm::ivec2 & size);
-	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, const float time = 0);
+	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, GLint level, const float time = 0);
 	void TakeDown();
 	Shader shader;
 	ADSShader adsShader;

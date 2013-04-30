@@ -313,3 +313,42 @@ void TexturedShader::CustomSetup()
 {
 	glUniform1i(this->texture_handle, 0);
 }
+
+//Text shader
+//TextShader::TextShader() : super()
+//{
+//
+//}
+//
+//bool TextShader::Initialize(char * vertex_shader_file, char * fragment_shader_file)
+//{
+//	/* Initialize the FreeType2 library */
+//	if (FT_Init_FreeType(&ft)) {
+//		fprintf(stderr, "Could not init freetype library\n");
+//		return 0;
+//	}
+//
+//	/* Load a font */	
+//	if (FT_New_Face(ft, fontfilename, 0, &face)) {
+//		fprintf(stderr, "Could not open font %s\n", fontfilename);
+//		return 0;
+//	}
+//
+//	if (super::Initialize(vertex_shader_file, fragment_shader_file) == false)
+//		return false;
+//
+//
+//	attribute_coord = get_attrib(program, "coord");	
+//	uniform_tex = get_uniform(program, "tex");
+//
+//	uniform_color = get_uniform(program, "color");
+//		
+//	if(attribute_coord == -1 || uniform_tex == -1 || uniform_color == -1)
+//		return 0;
+//
+//	// Create the vertex buffer object	
+//	glGenBuffers(1, &vbo);
+//
+//	return 1;	
+//
+//}

@@ -29,21 +29,32 @@ void Sphere::BuildNormalVisualizationGeometry()
 	}
 }
 
-bool Sphere::hit(float time)
+void Sphere::hit(float time)
 {
 	if(!is_hit)
 	{
 		this->is_hit = true;
-		cout << "is hit" << is_hit;
 	}
-	return true;
+	this->time = time;
+}
+
+bool Sphere::is_sphere_hit()
+{
+	return this->is_hit;
 }
 
 float Sphere::getTime()
 {
-	if (!is_hit)
-		return 1.0f;
-	return 0.0f;
+	return this->time;
+}
+
+void Sphere::setTime(float t)
+{
+	this->time = t;
+	if (t <= 0.0f)
+	{
+		this->is_hit = false;
+	}
 }
 
 vec3 Sphere::getPostion()
@@ -79,13 +90,14 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	mat4 m;
 	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
 	const int stacks_sphere = stacks;
-	//const float radius = 1.0f;
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
 	vec3 color = RED;
 	if (is_hit)
 		color = GREEN;
+	if (hit > 1)
+		color = BLUE;
 
 	const float increment_stacks = (3.14159f) / float(stacks_sphere);
 	const float increment_slices = (3.14159f) / slices;
@@ -322,7 +334,7 @@ void Sphere::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
+void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
 {
 	if (this->GLReturnedError("Sphere::Draw - on entry"))
 		return;

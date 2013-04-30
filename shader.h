@@ -15,6 +15,8 @@ Updates:
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class Shader
 {
@@ -93,4 +95,17 @@ public:
 private:
 	typedef Shader super;
 	GLuint texture_handle;
+};
+
+class TextShader : public Shader
+{
+public:
+	TextShader();
+	virtual bool Initialize(char * vertex_shader_file, char * fragment_shader_file);
+private:
+	typedef Shader super;
+protected:
+	GLint attribute_coord;
+	GLint uniform_tex;
+	GLint uniform_color;
 };

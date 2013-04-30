@@ -55,41 +55,42 @@ bool Map::InitializeFloor()
 	int steps = 15;
 	float increment = height / (float)steps;
 
+	VertexAttributesPCNT bottom_left_vertex, top_left_vertex, bottom_right_vertex, top_right_vertex;
+
 	//create the floor coordinates
 	for (int i = 0; i < steps; i++)
 	{
 		for (int j = 0; j < steps; j++)
 		{
-			VertexAttributesPCNT cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
 		
 			location = vec4(x, y, z, 1.0f);
-			cur_bottom_vertex.position = vec3(m * location);
-			cur_bottom_vertex.color = color;
-			cur_bottom_vertex.normal = vec3(normal_floor);
+			bottom_left_vertex.position = vec3(m * location);
+			bottom_left_vertex.color = color;
+			bottom_left_vertex.normal = vec3(normal_floor);
 
 			x = x + increment;
 			location = vec4(x, y, z, 1.0f);
-			nxt_bottom_vertex.position = vec3(m * location);
-			nxt_bottom_vertex.color = color;
-			nxt_bottom_vertex.normal = vec3(normal_floor);
+			bottom_right_vertex.position = vec3(m * location);
+			bottom_right_vertex.color = color;
+			bottom_right_vertex.normal = vec3(normal_floor);
 
 			z = z - increment;
 			location = vec4(x, y, z, 1.0f);
-			nxt_top_vertex.position = vec3(m * location);
-			nxt_top_vertex.color = color;
-			nxt_top_vertex.normal = vec3(normal_floor);
+			top_right_vertex.position = vec3(m * location);
+			top_right_vertex.color = color;
+			top_right_vertex.normal = vec3(normal_floor);
 
 			x = x - increment;
 			location = vec4(x, y, z, 1.0f);
-			cur_top_vertex.position = vec3(m * location);
-			cur_top_vertex.color = color;
-			cur_top_vertex.normal = vec3(normal_floor);
+			top_left_vertex.position = vec3(m * location);
+			top_left_vertex.color = color;
+			top_left_vertex.normal = vec3(normal_floor);
 
 			//Draw the floor
-			this->vertices.push_back(cur_bottom_vertex);
-			this->vertices.push_back(cur_top_vertex);
-			this->vertices.push_back(nxt_bottom_vertex);
-			this->vertices.push_back(nxt_top_vertex);
+			this->vertices.push_back(bottom_left_vertex);
+			this->vertices.push_back(top_left_vertex);
+			this->vertices.push_back(bottom_right_vertex);
+			this->vertices.push_back(top_right_vertex);
 
 			this->vertex_indices.push_back(vertices.size() - 1);
 			this->vertex_indices.push_back(vertices.size() - 3);
@@ -184,44 +185,81 @@ bool Map::InitializeWalls()
 	vec3 normal_floor = vec3(0.0f, 1.0f, 0.0f);
 
 	//create the wall (wall one)
-	VertexAttributesPCNT cur_bottom_vertex, cur_top_vertex, nxt_bottom_vertex, nxt_top_vertex;
-	x = -105.0f;
+	VertexAttributesPCNT bottom_left_vertex, top_left_vertex, bottom_right_vertex, top_right_vertex,
+		back_top_left, back_top_right, back_bottom_left, back_bottom_right;
+
+	top_left_vertex.texture_coordinate = vec2(0.00f, 0.75f);
+	top_right_vertex.texture_coordinate = vec2(1.00f, 0.75f);
+	bottom_left_vertex.texture_coordinate = vec2(0.00f, 0.25f);
+	bottom_right_vertex.texture_coordinate = vec2(1.00f, 0.25f);
+
+	back_bottom_left.texture_coordinate = vec2(0.00f, 0.00f);
+	back_bottom_right.texture_coordinate = vec2(1.00f, 0.00f);
+	back_top_left.texture_coordinate = vec2(0.00f, 1.00f);
+	back_top_right.texture_coordinate = vec2(1.00f, 1.00f);
+
+	x = -105.5f;
 	y = 2.0f;
 	z = -105.0f;
 	
 	location = vec4(x, y, z, 1.0f);
-	cur_top_vertex.position = vec3(m * location);
-	cur_top_vertex.color = color2;
-	cur_top_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
+	top_left_vertex.position = vec3(m * location);
+	top_left_vertex.color = color2;
+	top_left_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
-	x = 105.0f;
+	x = 105.5f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_top_vertex.position = vec3(m * location);
-	nxt_top_vertex.color = color2;
-	nxt_top_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
+	top_right_vertex.position = vec3(m * location);
+	top_right_vertex.color = color2;
+	top_right_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
 	y = 0.0f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_bottom_vertex.position = vec3(m * location);
-	nxt_bottom_vertex.color = color2;
-	nxt_bottom_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
+	bottom_right_vertex.position = vec3(m * location);
+	bottom_right_vertex.color = color2;
+	bottom_right_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
-	x = -105.0f;
+	x = -105.5f;
 	location = vec4(x, y, z, 1.0f);
-	cur_bottom_vertex.position = vec3(m * location);
-	cur_bottom_vertex.color = color2;
-	cur_bottom_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
+	bottom_left_vertex.position = vec3(m * location);
+	bottom_left_vertex.color = color2;
+	bottom_left_vertex.normal = vec3(0.0f, 0.0f, 1.0f);
 
-	cur_top_vertex.texture_coordinate = vec2(0.00f, 1.00f);
-	nxt_top_vertex.texture_coordinate = vec2(1.00f, 1.00f);
-	cur_bottom_vertex.texture_coordinate = vec2(0.00f, 0.00f);
-	nxt_bottom_vertex.texture_coordinate = vec2(1.00f, 0.00f);
+	z = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_left.position = vec3(m * location);
+	back_bottom_left.color = color2;
+	back_bottom_left.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	this->vertices.push_back(cur_top_vertex);
-	this->vertices.push_back(cur_bottom_vertex);
-	this->vertices.push_back(nxt_top_vertex);
-	this->vertices.push_back(nxt_bottom_vertex);
+	x = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_right.position = vec3(m * location);
+	back_bottom_right.color = color2;
+	back_bottom_right.normal = vec3(0.0f, 0.0f, -1.0f);
 
+	y = 2.0f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_right.position = vec3(m * location);
+	back_top_right.color = color2;
+	back_top_right.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	x = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_left.position = vec3(m * location);
+	back_top_left.color = color2;
+	back_top_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(back_top_left);
+	this->vertices.push_back(back_top_right);
+	this->vertices.push_back(back_bottom_left);
+	this->vertices.push_back(back_bottom_right);
+
+	this->vertices.push_back(top_left_vertex);
+	this->vertices.push_back(bottom_left_vertex);
+	this->vertices.push_back(top_right_vertex);
+	this->vertices.push_back(bottom_right_vertex);
+
+	//arena facing side
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 4);
 	this->vertex_indices.push_back(vertices.size() - 3);
@@ -229,40 +267,87 @@ bool Map::InitializeWalls()
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 2);
 	this->vertex_indices.push_back(vertices.size() - 4);
+	//top
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 4);
+	this->vertex_indices.push_back(vertices.size() - 8);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	//back side
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 6);
+	this->vertex_indices.push_back(vertices.size() - 5);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 5);
+
 
 	//wall 2
 	x = -105.0f;
 	y = 2.0f;
-	z = 105.0f;
+	z = -105.5f;
 	
 	location = vec4(x, y, z, 1.0f);
-	cur_top_vertex.position = vec3(m * location);
-	cur_top_vertex.color = color2;
-	cur_top_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
+	top_right_vertex.position = vec3(m * location);
+	top_right_vertex.color = color2;
+	top_right_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
-	z = -105.0f;
+	z = 105.5f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_top_vertex.position = vec3(m * location);
-	nxt_top_vertex.color = color2;
-	nxt_top_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
+	top_left_vertex.position = vec3(m * location);
+	top_left_vertex.color = color2;
+	top_left_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
 	y = 0.0f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_bottom_vertex.position = vec3(m * location);
-	nxt_bottom_vertex.color = color2;
-	nxt_bottom_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
+	bottom_left_vertex.position = vec3(m * location);
+	bottom_left_vertex.color = color2;
+	bottom_left_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
-	z = 105.0f;
+	z = -105.5f;
 	location = vec4(x, y, z, 1.0f);
-	cur_bottom_vertex.position = vec3(m * location);
-	cur_bottom_vertex.color = color2;
-	cur_bottom_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
+	bottom_right_vertex.position = vec3(m * location);
+	bottom_right_vertex.color = color2;
+	bottom_right_vertex.normal = vec3(1.0f, 0.0f, 0.0f);
 
-	this->vertices.push_back(cur_top_vertex);
-	this->vertices.push_back(cur_bottom_vertex);
-	this->vertices.push_back(nxt_top_vertex);
-	this->vertices.push_back(nxt_bottom_vertex);
+	x = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_right.position = vec3(m * location);
+	back_bottom_right.color = color2;
+	back_bottom_right.normal = vec3(0.0f, 0.0f, -1.0f);
 
+	z = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_left.position = vec3(m * location);
+	back_bottom_left.color = color2;
+	back_bottom_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	y = 2.0f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_right.position = vec3(m * location);
+	back_top_right.color = color2;
+	back_top_right.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	z = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_left.position = vec3(m * location);
+	back_top_left.color = color2;
+	back_top_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(back_top_left);
+	this->vertices.push_back(back_top_right);
+	this->vertices.push_back(back_bottom_left);
+	this->vertices.push_back(back_bottom_right);
+
+	this->vertices.push_back(top_left_vertex);
+	this->vertices.push_back(bottom_left_vertex);
+	this->vertices.push_back(top_right_vertex);
+	this->vertices.push_back(bottom_right_vertex);
+
+	//arena facing side
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 4);
 	this->vertex_indices.push_back(vertices.size() - 3);
@@ -270,40 +355,86 @@ bool Map::InitializeWalls()
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 2);
 	this->vertex_indices.push_back(vertices.size() - 4);
+	//top
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 4);
+	this->vertex_indices.push_back(vertices.size() - 8);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	//back side
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 6);
+	this->vertex_indices.push_back(vertices.size() - 5);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 5);
 
 	//wall 3
-	x = 105.0f;
+	x = -105.5f;
 	y = 2.0f;
 	z = 105.0f;
 	
 	location = vec4(x, y, z, 1.0f);
-	cur_top_vertex.position = vec3(m * location);
-	cur_top_vertex.color = color2;
-	cur_top_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
+	top_right_vertex.position = vec3(m * location);
+	top_right_vertex.color = color2;
+	top_right_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	x = -105.0f;
+	x = 105.5f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_top_vertex.position = vec3(m * location);
-	nxt_top_vertex.color = color2;
-	nxt_top_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
+	top_left_vertex.position = vec3(m * location);
+	top_left_vertex.color = color2;
+	top_left_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
 	y = 0.0f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_bottom_vertex.position = vec3(m * location);
-	nxt_bottom_vertex.color = color2;
-	nxt_bottom_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
+	bottom_left_vertex.position = vec3(m * location);
+	bottom_left_vertex.color = color2;
+	bottom_left_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	x = 105.0f;
+	x = -105.5f;
 	location = vec4(x, y, z, 1.0f);
-	cur_bottom_vertex.position = vec3(m * location);
-	cur_bottom_vertex.color = color2;
-	cur_bottom_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
+	bottom_right_vertex.position = vec3(m * location);
+	bottom_right_vertex.color = color2;
+	bottom_right_vertex.normal = vec3(0.0f, 0.0f, -1.0f);
 
-	this->vertices.push_back(cur_top_vertex);
-	this->vertices.push_back(cur_bottom_vertex);
-	this->vertices.push_back(nxt_top_vertex);
-	this->vertices.push_back(nxt_bottom_vertex);
+	z = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_right.position = vec3(m * location);
+	back_bottom_right.color = color2;
+	back_bottom_right.normal = vec3(0.0f, 0.0f, -1.0f);
 
+	x = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_left.position = vec3(m * location);
+	back_bottom_left.color = color2;
+	back_bottom_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	y = 2.0f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_left.position = vec3(m * location);
+	back_top_left.color = color2;
+	back_top_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	x = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_right.position = vec3(m * location);
+	back_top_right.color = color2;
+	back_top_right.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(back_top_left);
+	this->vertices.push_back(back_top_right);
+	this->vertices.push_back(back_bottom_left);
+	this->vertices.push_back(back_bottom_right);
+
+	this->vertices.push_back(top_left_vertex);
+	this->vertices.push_back(bottom_left_vertex);
+	this->vertices.push_back(top_right_vertex);
+	this->vertices.push_back(bottom_right_vertex);
+
+	//arena facing side
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 4);
 	this->vertex_indices.push_back(vertices.size() - 3);
@@ -311,40 +442,87 @@ bool Map::InitializeWalls()
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 2);
 	this->vertex_indices.push_back(vertices.size() - 4);
+	//top
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 4);
+	this->vertex_indices.push_back(vertices.size() - 8);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	//back side
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 6);
+	this->vertex_indices.push_back(vertices.size() - 5);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 5);
+
 
 	//wall 4
 	x = 105.0f;
 	y = 2.0f;
-	z = -105.0f;
+	z = -105.5f;
 	
 	location = vec4(x, y, z, 1.0f);
-	cur_top_vertex.position = vec3(m * location);
-	cur_top_vertex.color = color2;
-	cur_top_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
+	top_left_vertex.position = vec3(m * location);
+	top_left_vertex.color = color2;
+	top_left_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
-	z = 105.0f;
+	z = 105.5f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_top_vertex.position = vec3(m * location);
-	nxt_top_vertex.color = color2;
-	nxt_top_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
+	top_right_vertex.position = vec3(m * location);
+	top_right_vertex.color = color2;
+	top_right_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
 	y = 0.0f;
 	location = vec4(x, y, z, 1.0f);
-	nxt_bottom_vertex.position = vec3(m * location);
-	nxt_bottom_vertex.color = color2;
-	nxt_bottom_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
+	bottom_right_vertex.position = vec3(m * location);
+	bottom_right_vertex.color = color2;
+	bottom_right_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
-	z = -105.0f;
+	z = -105.5f;
 	location = vec4(x, y, z, 1.0f);
-	cur_bottom_vertex.position = vec3(m * location);
-	cur_bottom_vertex.color = color2;
-	cur_bottom_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
+	bottom_left_vertex.position = vec3(m * location);
+	bottom_left_vertex.color = color2;
+	bottom_left_vertex.normal = vec3(-1.0f, 0.0f, 0.0f);
 
-	this->vertices.push_back(cur_top_vertex);
-	this->vertices.push_back(cur_bottom_vertex);
-	this->vertices.push_back(nxt_top_vertex);
-	this->vertices.push_back(nxt_bottom_vertex);
+	x = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_left.position = vec3(m * location);
+	back_bottom_left.color = color2;
+	back_bottom_left.normal = vec3(0.0f, 0.0f, -1.0f);
 
+	z = 105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_bottom_right.position = vec3(m * location);
+	back_bottom_right.color = color2;
+	back_bottom_right.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	y = 2.0f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_right.position = vec3(m * location);
+	back_top_right.color = color2;
+	back_top_right.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	z = -105.5f;
+	location = vec4(x, y, z, 1.0f);
+	back_top_left.position = vec3(m * location);
+	back_top_left.color = color2;
+	back_top_left.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(back_top_left);
+	this->vertices.push_back(back_top_right);
+	this->vertices.push_back(back_bottom_left);
+	this->vertices.push_back(back_bottom_right);
+
+	this->vertices.push_back(top_left_vertex);
+	this->vertices.push_back(bottom_left_vertex);
+	this->vertices.push_back(top_right_vertex);
+	this->vertices.push_back(bottom_right_vertex);
+
+	//arena facing side
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 4);
 	this->vertex_indices.push_back(vertices.size() - 3);
@@ -352,6 +530,22 @@ bool Map::InitializeWalls()
 	this->vertex_indices.push_back(vertices.size() - 1);
 	this->vertex_indices.push_back(vertices.size() - 2);
 	this->vertex_indices.push_back(vertices.size() - 4);
+	//top
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 4);
+	this->vertex_indices.push_back(vertices.size() - 8);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	//back side
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 6);
+	this->vertex_indices.push_back(vertices.size() - 5);
+			
+	this->vertex_indices.push_back(vertices.size() - 7);
+	this->vertex_indices.push_back(vertices.size() - 8);
+	this->vertex_indices.push_back(vertices.size() - 5);
 
 
 	
@@ -407,7 +601,7 @@ void Map::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
+void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
 {
 	if (this->GLReturnedError("Floor::Draw - on entry"))
 		return;
@@ -468,7 +662,7 @@ void Map::Draw_walls(const mat4 & projection, mat4 modelview, const ivec2 & size
   mat4 mvp = projection * modelview;
   mat3 nm = inverse(transpose(mat3(modelview)));
 
-  TextureManager::Inst()->BindTexture(4,0);	//Bind it to the crate texture
+  TextureManager::Inst()->BindTexture(8,0);	//Bind it to the crate texture
 
 	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
 	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
