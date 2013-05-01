@@ -243,36 +243,37 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
 	fbo.Bind();
-	mat4 modelview;
+	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	//mat4 modelview;
 	//mat4 projection;
 	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
-	//glMatrixMode(GL_PROJECTION);
-	//glPushMatrix();
-	//glLoadIdentity();
-	//gluPerspective(20, double(fbo.size.x) / double(fbo.size.y), 1, 10);
-	//glViewport(0, 0, fbo.size.x, fbo.size.y);
-	//glMatrixMode(GL_MODELVIEW);
-	//glPushMatrix();
-	//glLoadIdentity();
-	//gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
-	//glRotatef(-time * 60.0f, 1.0f, 1.0f, 0.0f);
-	//Axes();
-	//glBegin(GL_TRIANGLES);
-	//glColor3f(1.0f, 0.0f, 0.0f);
-	//glVertex2f(0.0f, 0.5f);
-	//glColor3f(0.0f, 1.0f, 0.0f);
-	//glVertex2f(-0.5f, -0.5f);
-	//glColor3f(0.0f, 0.0f, 1.0f);
-	//glVertex2f(0.5f, -0.5f);
-	//glEnd();
-	//glPopMatrix();
-	//glMatrixMode(GL_PROJECTION);
-	//glPopMatrix();
-	//glPopAttrib();
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	gluPerspective(20, double(fbo.size.x) / double(fbo.size.y), 1, 10);
+	glViewport(0, 0, fbo.size.x, fbo.size.y);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
+	glRotatef(-time * 60.0f, 1.0f, 1.0f, 0.0f);
+	Axes();
+	glBegin(GL_TRIANGLES);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex2f(0.0f, 0.5f);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex2f(-0.5f, -0.5f);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex2f(0.5f, -0.5f);
+	glEnd();
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
 	//DisplayFunc();
-	ball.Draw(p, modelview, window.size, window.stage);
+	//ball.Draw(p, m, window.size, window.stage);
 	fbo.Unbind();
 
 	//fbo.Bind();
@@ -595,6 +596,7 @@ void DisplayFunc()
 	float tempLookatX = lookatX;
 	float tempLookatZ = lookatZ;
 
+
 	//movement (with a buffer zone in center) in first person view
 	if (debug_mode != 2 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
 	{
@@ -750,9 +752,12 @@ void DisplayFunc()
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 
-	sky.Draw(projection, modelview, window.size, window.stage);
+	//FrameBuffering
+	RenderIntoFrameBuffer(modelview, projection);
+	//glViewport(0, 0, window.size.x, window.size.y);
 
-	screen.Draw(projection, modelview, window.size, window.stage);
+	//Draw skybox
+	sky.Draw(projection, modelview, window.size, window.stage);
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
@@ -763,18 +768,12 @@ void DisplayFunc()
 	//Draw jumbotrons and scoreboards
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
 	tron.Draw(projection, modelview, window.size, window.stage);
-	//framebuffer testing
-	//glEnable(GL_DEPTH_TEST);
-	modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));
-	RenderIntoFrameBuffer(modelview, projection);
-	//UseFramebufferToDrawSomething(modelview, projection);
-	glViewport(0, 0, window.size.x, window.size.y);
-	modelview = translate(modelview, vec3(0.0f, -5.0f, 0.0f));
-
+	screen.DrawScreen(projection, modelview, window.size, fbo);
 	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
 	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
 	tron.Draw(projection, modelview, window.size, window.stage);
+	screen.DrawScreen(projection, modelview, window.size, fbo);
 	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
 	modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));

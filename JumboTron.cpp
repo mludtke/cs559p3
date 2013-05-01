@@ -54,7 +54,7 @@ bool JumboTron::InitializeCylinder()
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
 	float stack_increment = height/(float)stacks;
 
-	VertexAttributesPCN bottomLeft, bottomRight, topLeft, topRight;
+	VertexAttributesPCNT bottomLeft, bottomRight, topLeft, topRight;
 
 	for (int i = 0; i <= stacks; i++)
 	{
@@ -118,9 +118,9 @@ bool JumboTron::InitializeCylinder()
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3)));	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
@@ -193,8 +193,12 @@ bool JumboTron::InitializeScreen()
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
 	float stack_increment = height/(float)stacks;
 
-	VertexAttributesPCN bottomLeft, bottomRight, topLeft, topRight;
+	VertexAttributesPCNT bottomLeft, bottomRight, topLeft, topRight;
 
+	bottomLeft.texture_coordinate = vec2(0.0f, 0.0f);
+	bottomRight.texture_coordinate = vec2(1.0f, 0.0f);
+	topLeft.texture_coordinate = vec2(0.0f, 1.0f);
+	topRight.texture_coordinate = vec2(1.0f, 1.0f);
 	
 	bottomLeft.position = vec3(-5.0f, 5.0f, 0.21f);
 	bottomLeft.color = color2;
@@ -227,17 +231,19 @@ bool JumboTron::InitializeScreen()
 
 
 
-	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
-		return false;
+ if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCNT), &this->vertices[0]))
+    return false;  
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3)));	
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+  glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
+  glEnableVertexAttribArray(3);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 	if (this->normal_vertices.size() > 0)
 	{
@@ -251,30 +257,13 @@ bool JumboTron::InitializeScreen()
 	}
 
 	
-	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;
-	
-	/*if(shader == 1)
-	{
-		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
-			return false;
-	}
-	if(shader == 2)
-	{
-		if(!this->adsShader.Initialize("light.vert", "light.frag"))
-			return false;
-		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			//return false;
-	}
-	if(shader == 3)
-	{
-		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			return false;
-	}
+	if (!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
+		return false;
 
 	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
-			return false;
-*/
+		return false;
+
+	
 	if (this->GLReturnedError("Jumbotron::Initialize - on exit"))
 		return false;
 
@@ -308,23 +297,6 @@ void JumboTron::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size
 	shader.Use();
 	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
-/*	if(shade == 2)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-
-		//adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		//adsShader.SetMaterial(vec3(0.0f, 0.0f, 0.0f), vec3(0.588235f, 0.670588f, 0.729412f), vec3(0.9f, 0.9f, 0.9f), 96.0f);
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}
-	if(shade == 3)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}*/
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);
@@ -342,6 +314,48 @@ void JumboTron::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size
 
 	if (this->GLReturnedError("JumboTron::Draw - on exit"))
 		return;
+}
+
+void JumboTron::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 & size, FrameBufferObject fbo, const float time)
+{
+	if (this->GLReturnedError("screen::Draw - on entry"))
+    return;
+
+  glEnable(GL_DEPTH_TEST);
+
+  modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
+  mat4 mvp = projection * modelview;
+  mat3 nm = inverse(transpose(mat3(modelview)));
+
+  glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+  glEnable(GL_TEXTURE_2D);
+
+	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR);
+
+  shader.Use();
+  shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+  glBindVertexArray(this->vertex_array_handle);
+  glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
+  glBindVertexArray(0);
+  glUseProgram(0);
+
+  if (this->draw_normals)
+  {    
+    this->solid_color.Use();
+    this->solid_color.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+    glBindVertexArray(this->normal_array_handle);
+    glDrawElements(GL_LINES , this->normal_indices.size(), GL_UNSIGNED_INT , &this->normal_indices[0]);
+    glBindVertexArray(0);
+    glUseProgram(0);
+  }
+
+  if (this->GLReturnedError("Screen::Draw - on exit"))
+    return;
+
 }
 
 
