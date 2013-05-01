@@ -11,6 +11,7 @@
 #include <iostream>
 #include <assert.h>
 #include "object.h"
+#include "constants.h"
 
 using namespace std;
 using namespace glm;

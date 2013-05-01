@@ -11,7 +11,7 @@ class Map : public Object
 public:
 	Map();
 	
-	bool InitializeFloor();
+	bool InitializeFloor(bool minimap);
 
 	bool InitializeWalls();
 

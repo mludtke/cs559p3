@@ -69,7 +69,7 @@ public:
 Sphere ball;	//normal ball
 Sphere ball2;	//hit ball
 Sphere player;
-Map ground, walls, cursor;	//map objects
+Map ground, walls, cursor, ground2;	//map objects
 JumboTron tron;	//JumboTrons
 vector<Sphere> balls; //balls
 vector<Obstacle> boxes;
@@ -104,6 +104,8 @@ int debug_mode = 1;	//keeps track of what debug mode it is in
 b2BodyDef groundBodyDef;
 b2PolygonShape groundBox;
 b2BodyDef bodyDef;
+
+void DisplayFunc();
 
 GLvoid setLevel()
 {
@@ -240,32 +242,34 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
 	fbo.Bind();
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluPerspective(20, double(fbo.size.x) / double(fbo.size.y), 1, 10);
-	glViewport(0, 0, fbo.size.x, fbo.size.y);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
-	glRotatef(-time * 60.0f, 1.0f, 1.0f, 0.0f);
-	Axes();
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(0.0f, 0.5f);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-0.5f, -0.5f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(0.5f, -0.5f);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
+	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
+	//glMatrixMode(GL_PROJECTION);
+	//glPushMatrix();
+	//glLoadIdentity();
+	//gluPerspective(20, double(fbo.size.x) / double(fbo.size.y), 1, 10);
+	//glViewport(0, 0, fbo.size.x, fbo.size.y);
+	//glMatrixMode(GL_MODELVIEW);
+	//glPushMatrix();
+	//glLoadIdentity();
+	//gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
+	//glRotatef(-time * 60.0f, 1.0f, 1.0f, 0.0f);
+	//Axes();
+	//glBegin(GL_TRIANGLES);
+	//glColor3f(1.0f, 0.0f, 0.0f);
+	//glVertex2f(0.0f, 0.5f);
+	//glColor3f(0.0f, 1.0f, 0.0f);
+	//glVertex2f(-0.5f, -0.5f);
+	//glColor3f(0.0f, 0.0f, 1.0f);
+	//glVertex2f(0.5f, -0.5f);
+	//glEnd();
+	//glPopMatrix();
+	//glMatrixMode(GL_PROJECTION);
+	//glPopMatrix();
+	//glPopAttrib();
+	//DisplayFunc();
+	ball.Draw(p, m, window.size, window.stage);
 	fbo.Unbind();
 
 	//fbo.Bind();
@@ -288,17 +292,20 @@ void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 	//glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_PROJECTION);
+	/*glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(15, 10.0/5.0, 1, 10);
+	gluPerspective(15, 10.0/5.0, 1, 10);*/
+	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
 	//glViewport(0, 0, window.size.x/2.0, window.size.y/2.0);
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
+	mat4 modelview;
 	//ball.Draw(p, m, window.size);
-	glLoadIdentity();
-	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
+	/*glLoadIdentity();
+	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);*/
+	modelview = lookAt(vec3(0.0f, 0.0f, 5.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
 	//glRotatef(time * 30.0f, 0.0f, 1.0f, 0.0f);
-	glRotatef(-30, 1.0f, 0.0f, 0.0f);
-	Axes();
+	//glRotatef(-30, 1.0f, 0.0f, 0.0f);
+	/*Axes();
 	glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
 	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
@@ -312,10 +319,10 @@ void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 	glVertex2f(-0.5f, 0.5f);
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);*/
 
 	////glViewport(0, 0, window.size.x/2.0, window.size.y/2.0);
-	////ball.Draw(p, m, window.size);
+	ball.Draw(projection, modelview, window.size, window.stage);
 	//glLoadIdentity();
 	////glRotatef(time * 30.0f, 0.0f, 1.0f, 0.0f);
 	//glRotatef(-30, 1.0f, 0.0f, 0.0f);
@@ -345,6 +352,7 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	ball.TakeDown();
 	ball2.TakeDown();
 	ground.TakeDown();
+	ground2.TakeDown();
 	walls.TakeDown();
 	tron.TakeDown();
 	sky.TakeDown();
@@ -504,7 +512,7 @@ void DisplayFunc2()
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	ground.Draw(projection, modelview, window.size, window.stage);
+	ground2.Draw(projection, modelview, window.size, window.stage);
 	//modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 	
 
@@ -512,7 +520,7 @@ void DisplayFunc2()
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
 	modelview = translate(modelview, vec3(xpos, ypos, zpos));
-	ball.Draw(projection, modelview, window.size, window.stage);
+	player.Draw(projection, modelview, window.size, window.stage);
 	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
 	for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
@@ -596,16 +604,27 @@ void DisplayFunc()
 		{
 			
 			lookatZ = zpos - (lookatZ - zpos);
-			if (((int)angleV % 360) < 90  || ((int)angleV % 90 > 180 && (int)angleV % 90 < 270))
+
+			while (angleV < 0.0f)
+				angleV = 360.0f + angleV;
+
+			if (fmod(angleV, 180.0f) < 90.0f)
 			{
-				cout << "AngleV: " << angleV << endl;
+				cout << "less than 90, AngleV: " << angleV << endl;
+				cout << fmod(angleV, 180.0f) << endl;
 				angleV = angleV + 90.0f;
 				cout << "new angleV: " << angleV << endl;
 			}
+			else if (fmod(angleV, 180.0f) == 0)
+			{
+				angleV = angleV - 180.0f;
+			}
 			else
-				angleV = angleV + 90.0f;
-			/*if (xpos == lookatX)
-				angleV = angleV - 180.0f;*/
+			{
+				cout << "other, AngleV: " << angleV << endl;
+				angleV = angleV - 90.0f;
+				cout << "new angleV: " << angleV << endl;
+			}
 		}
 
 		//move forward and backwards
@@ -661,16 +680,28 @@ void DisplayFunc()
 
 				if (yDiffFromCenter > 0)	//rotate around if hit head on
 				{
-					    /*float tempLookX = lookatX;
-						lookatX = xpos - (lookatX - xpos);
-						angleV = -angleV;*/
 					
 					if (zpos < boxes.at(i).getPostion().z - window.obstacle_width/2.0f || zpos > boxes.at(i).getPostion().z + window.obstacle_width/2.0f)
 					{
 						//lookatX = tempLookX;
 						lookatZ = zpos - (lookatZ - zpos);
-						angleV = angleV + 180.0f;
 
+						while (angleV < 0.0f)
+							angleV = 360.0f + angleV;
+
+						if (fmod(angleV, 180.0f) < 90.0f)
+						{
+							cout << fmod(angleV, 180.0f) << endl;
+							angleV = angleV + 90.0f;
+						}
+						else if (fmod(angleV, 180.0f) == 0)
+						{
+							angleV = angleV - 180.0f;
+						}
+						else
+						{
+							angleV = angleV - 90.0f;
+						}
 						cout << "hit z side " << endl;
 					}
 
@@ -719,7 +750,7 @@ void DisplayFunc()
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	ground.Draw(projection, modelview, window.size, window.stage);
+	ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
 	walls.Draw_walls(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
@@ -728,11 +759,11 @@ void DisplayFunc()
 	tron.Draw(projection, modelview, window.size, window.stage);
 	//framebuffer testing
 	//glEnable(GL_DEPTH_TEST);
-	/*modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));
 	RenderIntoFrameBuffer(modelview, projection);
 	UseFramebufferToDrawSomething(modelview, projection);
 	glViewport(0, 0, window.size.x, window.size.y);
-	modelview = translate(modelview, vec3(0.0f, -5.0f, 0.0f));*/
+	modelview = translate(modelview, vec3(0.0f, -5.0f, 0.0f));
 
 	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
 	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
@@ -937,7 +968,9 @@ GLint main(GLint argc, GLchar * argv[])
 		return 0;
 	if (!player.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 2, 0.00f))	//hit = 2 to show not a playing object
 		return 0;
-	if (!ground.InitializeFloor())
+	if (!ground.InitializeFloor(false))
+		return 0;
+	if (!ground2.InitializeFloor(true))
 		return 0;
 	if (!walls.InitializeWalls())
 		return 0;
@@ -975,4 +1008,5 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(TextureManager::Inst()->LoadTexture((const char *) "advertisments.jpg", 8));
 
 	glutMainLoop();
+	system("pause");
 }

@@ -204,34 +204,34 @@ void free_resources() {
 	glDeleteProgram(program);
 }
 
-//int main(int argc, char *argv[]) {
-//	glutInit(&argc, argv);
-//	glutInitDisplayMode(GLUT_RGB);
-//	glutInitWindowSize(640, 480);
-//	glutCreateWindow("Basic Text");
-//	if (argc > 1)
-//		fontfilename = argv[1];
-//	else
-//		fontfilename = "FreeSans.ttf";
-//	GLenum glew_status = glewInit();
-//
-//	if (GLEW_OK != glew_status) {
-//		fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status));
-//		return 1;
-//
-//	}
-//
-//	if (!GLEW_VERSION_2_0) {
-//		fprintf(stderr, "No support for OpenGL 2.0 found\n");
-//		return 1;
-//
-//	}
-//
-//	/*if (init_resources()) {
-//		glutDisplayFunc(display);
-//		glutMainLoop();
-//	}*/
-//	free_resources();
-//	return 0;
-//	
-//}
+int main(int argc, char *argv[]) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB);
+	glutInitWindowSize(640, 480);
+	glutCreateWindow("Basic Text");
+	if (argc > 1)
+		fontfilename = argv[1];
+	else
+		fontfilename = "FreeSans.ttf";
+	GLenum glew_status = glewInit();
+
+	if (GLEW_OK != glew_status) {
+		fprintf(stderr, "Error: %s\n", glewGetErrorString(glew_status));
+		return 1;
+
+	}
+
+	if (!GLEW_VERSION_2_0) {
+		fprintf(stderr, "No support for OpenGL 2.0 found\n");
+		return 1;
+
+	}
+
+	/*if (init_resources()) {
+		glutDisplayFunc(display);
+		glutMainLoop();
+	}*/
+	free_resources();
+	return 0;
+	
+}

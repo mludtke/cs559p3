@@ -29,7 +29,7 @@ void Map::BuildNormalVisualizationGeometry()
 	}
 }
 
-bool Map::InitializeFloor()
+bool Map::InitializeFloor(bool minimap)
 {
 	if (this->GLReturnedError("Floor::Initialize - on entry"))
 		return false;
@@ -44,8 +44,11 @@ bool Map::InitializeFloor()
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
-	vec3 color = GREEN;
-	vec3 color2 = BLUE;
+	vec3 color;
+	if (!minimap)
+		color = GREEN;
+	else
+	    color = GREEN;
 	vec3 normal_floor = vec3(0.0f, 1.0f, 0.0f);
 
 	x = -105.0f;
@@ -136,9 +139,22 @@ bool Map::InitializeFloor()
 	}
 
 	
-	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+	/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+			return false;*/
+	if (!minimap)
+	{
+		if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
 			return false;
-	
+		/*if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("water_shader.vert", "water_shader.frag"))
+			return false;*/
+	}
+	else
+	{
+		if (!this->shader.Initialize("solid_shader.vert", "solid_shader.frag"))
+			return false;
+	}
 	/*if(shader == 1)
 	{
 		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
