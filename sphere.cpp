@@ -93,9 +93,9 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	float theta = 0.0f, phi = 0.0f;
 	float x, y, z;
 	vec4 location;
-	vec3 color = RED;
+	vec3 color = GREEN;
 	if (is_hit)
-		color = GREEN;
+		color = RED;
 	if (hit > 1)
 		color = BLUE;
 
@@ -295,23 +295,7 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 		if (!this->shader.Initialize("blue_shader.vert", "blue_shader.frag"))
 			return false;
 	}
-	/*
-	if(shader == 2)
-	{
-		if(!this->adsShader.Initialize("light.vert", "light.frag"))
-			return false;
-		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			//return false;
-	}
-	if(shader == 3)
-	{
-		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			return false;
-	}
-
-	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
-			return false;
-*/
+	
 	if (this->GLReturnedError("Sphere::Initialize - on exit"))
 		return false;
 
@@ -347,23 +331,7 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 	shader.Use();
 	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
-/*	if(shade == 2)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
-		//adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		//adsShader.SetMaterial(vec3(0.0f, 0.0f, 0.0f), vec3(0.588235f, 0.670588f, 0.729412f), vec3(0.9f, 0.9f, 0.9f), 96.0f);
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}
-	if(shade == 3)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}*/
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);

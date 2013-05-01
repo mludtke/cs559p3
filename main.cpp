@@ -107,6 +107,7 @@ b2BodyDef bodyDef;
 
 void DisplayFunc();
 void DisplayFunc2();
+void DisplayFunc3();
 
 GLvoid setLevel()
 {
@@ -205,6 +206,7 @@ void DisplayCursor()
 	}
 }
 
+//used for testing purposes
 void Axes()
 {
 	GLUquadric * q = gluNewQuadric();
@@ -240,55 +242,14 @@ void Axes()
 
 void RenderIntoFrameBuffer(mat4 m, mat4 p)
 {
-	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
 	fbo.Bind();
-	//glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	//mat4 modelview;
-	//mat4 projection;
-	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-	//glClear(GL_DEPTH_BUFFER_BIT);
-	glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluPerspective(20, double(fbo.size.x) / double(fbo.size.y), 1, 10);
-	glViewport(0, 0, fbo.size.x, fbo.size.y);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	gluLookAt(0, 0, 5.5, 0, 0, 0, 0, 1, 0);
-	glRotatef(-time * 60.0f, 1.0f, 1.0f, 0.0f);
-	Axes();
-	glBegin(GL_TRIANGLES);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex2f(0.0f, 0.5f);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex2f(-0.5f, -0.5f);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex2f(0.5f, -0.5f);
-	glEnd();
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-	//DisplayFunc();
-	//ball.Draw(p, m, window.size, window.stage);
+	DisplayFunc3();
 	fbo.Unbind();
-
-	//fbo.Bind();
-	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
-
-	////glViewport(0, 0, fbo.size.x, fbo.size.y);
-	//ball.Draw(p, m, fbo.size);
-
-	//fbo.Unbind();
 	
 }
 
-
+//used for testing purposes
 void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 {
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -346,9 +307,6 @@ void UseFramebufferToDrawSomething(mat4 m, mat4 p)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	//glDisable(GL_TEXTURE_2D);
 }
-
-
-
 
 void CloseFunc()	//Makes sure everything is deleted when the window is closed
 {
@@ -487,7 +445,105 @@ void Box()
 	b2Body* body = world.CreateBody(&bodyDef);
 }
 
+//Jumbotron display function
+void DisplayFunc3()
+{
+	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
+	glDisable(GL_CULL_FACE);
+
+	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, fbo.size.x, fbo.size.y);
+
+	mat4 projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
+
+	radius = 20.0f;
+
+	mat4 modelview;
+	if (debug_mode == 1) //game playing view
+	{
+		modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, ypos, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+	}
+	else if (debug_mode == 2)
+	{
+		modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	}
+	else
+	{
+		modelview = lookAt(vec3(0.1f, 30.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	}
+	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+	//Draw skybox
+	sky.Draw(projection, modelview, window.size, window.stage);
+
+	//Draw map elements (ground and walls)
+	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+	ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
+	walls.Draw_walls(projection, modelview, window.size);
+	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
+
+	//Draw jumbotrons and scoreboards
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	tron.Draw(projection, modelview, window.size, window.stage);
+	//screen.DrawScreen(projection, modelview, window.size, fbo);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	tron.Draw(projection, modelview, window.size, window.stage);
+	//screen.DrawScreen(projection, modelview, window.size, fbo);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	score.Draw(projection, modelview, window.size, window.stage);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+	score.Draw(projection, modelview, window.size, window.stage);
+	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+	modelview = rotate(modelview, -90.0f, vec3(0.0f, 1.0f, 0.0f));
+
+	//Draw player (and other objects)
+	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
+	modelview = translate(modelview, vec3(xpos, ypos, zpos));
+	player.Draw(projection, modelview, window.size, window.stage);
+	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
+
+	window.num_hit = 0;
+	for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
+	{
+		modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
+		if (balls.at(i).is_sphere_hit())
+		{
+			ball2.Draw(projection, modelview, window.size, window.stage);
+		}
+		else
+		{
+			ball.Draw(projection, modelview, window.size, window.stage);
+		}
+		modelview = translate(modelview, -balls.at(i).getPostion());
+	}
+
+	
+	modelview = translate(modelview, vec3(0.0f, -window.ball_radius, 0.0f));
+	for (int i = 0; i < (int)boxes.size(); i++)	//places the desired number of obstacles on field
+	{
+		modelview = translate(modelview, boxes.at(i).getPostion());	//places in random location
+		box.Draw(projection, modelview, window.size, window.stage);
+		modelview = translate(modelview, -boxes.at(i).getPostion());
+	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+
+	glFlush();
+	glutPostRedisplay(); // FPS
+}
+
+//Minimap display function
 void DisplayFunc2()
 {
 	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -577,6 +633,7 @@ Obstacle Object_movement(Obstacle obst, vec3 obj_pos, float force, vec3 directio
 	return obst;
 }
 
+//overall display function
 void DisplayFunc()
 {
 	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -598,7 +655,7 @@ void DisplayFunc()
 
 
 	//movement (with a buffer zone in center) in first person view
-	if (debug_mode != 2 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
+	if ((debug_mode != 2 || debug_mode != 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
 	{
 
 		if ((xpos <= -105.0f + window.ball_radius || xpos >= 105 - window.ball_radius))	//bounce off walls
@@ -651,7 +708,7 @@ void DisplayFunc()
 	}
 
 	//movement in third person view
-	if (debug_mode == 2 && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
+	if ((debug_mode == 2 || debug_mode == 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
 	{
 		angleH = angleH - xDiffFromCenter * 0.005f;
 		cameraX = sin(angleH * (PI / 180)) * 110.0f;
@@ -746,18 +803,23 @@ void DisplayFunc()
 	{
 		modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 	}
+	else if (debug_mode == 3)
+	{
+		modelview = lookAt(vec3(0.1f, 400.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+	}
 	else
 	{
-		modelview = lookAt(vec3(0.0f, 30.0f, 0.0f), vec3(cameraX, 0.0f, cameraZ), vec3(0.0f, 1.0f, 0.0f));
+		modelview = lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(cameraX, 0.0f, cameraZ), vec3(0.0f, 1.0f, 0.0f));
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
 
 	//FrameBuffering
 	RenderIntoFrameBuffer(modelview, projection);
-	//glViewport(0, 0, window.size.x, window.size.y);
+	glViewport(0, 0, window.size.x, window.size.y);
 
 	//Draw skybox
-	sky.Draw(projection, modelview, window.size, window.stage);
+	if (debug_mode != 3)
+		sky.Draw(projection, modelview, window.size, window.stage);
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));

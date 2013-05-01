@@ -139,9 +139,7 @@ bool Map::InitializeFloor(bool minimap)
 	}
 
 	
-	/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;*/
-	if (!minimap)
+	if (!minimap) //special effects should not be done on minimap
 	{
 		if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
 			return false;
@@ -150,32 +148,12 @@ bool Map::InitializeFloor(bool minimap)
 		/*if(!this->shader.Initialize("water_shader.vert", "water_shader.frag"))
 			return false;*/
 	}
-	else
+	else //need basic shading for the minimap
 	{
 		if (!this->shader.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
 	}
-	/*if(shader == 1)
-	{
-		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
-			return false;
-	}
-	if(shader == 2)
-	{
-		if(!this->adsShader.Initialize("light.vert", "light.frag"))
-			return false;
-		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			//return false;
-	}
-	if(shader == 3)
-	{
-		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			return false;
-	}
 
-	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
-			return false;
-*/
 	if (this->GLReturnedError("Floor::Initialize - on exit"))
 		return false;
 	return true;
