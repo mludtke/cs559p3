@@ -113,43 +113,14 @@ bool JumboTron::InitializeCylinder()
 		y += stack_increment;
 	}
 
-	bottomLeft.position = vec3(-5.0f, 5.0f, 0.21f);
-	bottomLeft.color = color2;
-	bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
-
-	bottomRight.position = vec3(5.0f, 5.0f, 0.21f);
-	bottomRight.color = color2;
-	bottomRight.normal = vec3(0.0f, 0.0f, -1.0f);
-
-	topRight.position = vec3(5.0f, 10.0f, 0.21f);
-	topRight.color = color2;
-	topRight.normal = vec3(0.0f, 0.0f, -1.0f);
-
-	topLeft.position = vec3(-5.0f, 10.0f, 0.21f);
-	topLeft.color = color2;
-	topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
-
-	this->vertices.push_back(bottomLeft);
-	this->vertices.push_back(bottomRight);
-	this->vertices.push_back(topRight);
-	this->vertices.push_back(topLeft);
-
-	this->vertex_indices.push_back(vertices.size() - 1);
-	this->vertex_indices.push_back(vertices.size() - 3);
-	this->vertex_indices.push_back(vertices.size() - 4);
-			
-	this->vertex_indices.push_back(vertices.size() - 1);
-	this->vertex_indices.push_back(vertices.size() - 2);
-	this->vertex_indices.push_back(vertices.size() - 3);
-
 
 
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	// Note offset - legacy of older code
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 1));	// Same
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
@@ -198,7 +169,118 @@ bool JumboTron::InitializeCylinder()
 	return true;
 }
 
+bool JumboTron::InitializeScreen()
+{
+	if (this->GLReturnedError("JumboTron::Initialize - on entry"))
+		return false;
 
+	if (!super::Initialize())
+		return false;
+
+	mat4 m;
+	int slices = 20;
+	int stacks = 6;
+	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
+	const float radius = 0.2f;
+	float theta = 0.0f, phi = 0.0f;
+	float x, y, z;
+	y = 0.0f;
+	vec4 location;
+	vec3 color = CYAN;
+	vec3 color2 = WHITE;
+	float height = 7.0f;
+
+	const float increment_slices = (2 * 3.14159f) / (float)slices;
+	float stack_increment = height/(float)stacks;
+
+	VertexAttributesPCN bottomLeft, bottomRight, topLeft, topRight;
+
+	
+	bottomLeft.position = vec3(-5.0f, 5.0f, 0.21f);
+	bottomLeft.color = color2;
+	bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	bottomRight.position = vec3(5.0f, 5.0f, 0.21f);
+	bottomRight.color = color2;
+	bottomRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topRight.position = vec3(5.0f, 10.0f, 0.21f);
+	topRight.color = color2;
+	topRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topLeft.position = vec3(-5.0f, 10.0f, 0.21f);
+	topLeft.color = color2;
+	topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(bottomLeft);
+	this->vertices.push_back(bottomRight);
+	this->vertices.push_back(topRight);
+	this->vertices.push_back(topLeft);
+
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 3);
+	this->vertex_indices.push_back(vertices.size() - 4);
+			
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 3);
+
+
+
+	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
+		return false;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	if (this->normal_vertices.size() > 0)
+	{
+		if (!this->PostGLInitialize(&this->normal_array_handle, &this->normal_coordinate_handle, this->normal_vertices.size() * sizeof(VertexAttributesP), &this->normal_vertices[0]))
+			return false;
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesP), (GLvoid *) 0);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+
+	
+	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+			return false;
+	
+	/*if(shader == 1)
+	{
+		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
+			return false;
+	}
+	if(shader == 2)
+	{
+		if(!this->adsShader.Initialize("light.vert", "light.frag"))
+			return false;
+		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
+			//return false;
+	}
+	if(shader == 3)
+	{
+		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
+			return false;
+	}
+
+	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
+			return false;
+*/
+	if (this->GLReturnedError("Jumbotron::Initialize - on exit"))
+		return false;
+
+	return true;
+
+}
 void JumboTron::TakeDown()
 {
 	this->vertices.clear();

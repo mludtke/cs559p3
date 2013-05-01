@@ -11,6 +11,7 @@ public:
 	JumboTron();
 	
 	bool InitializeCylinder();
+	bool InitializeScreen();
 
 	virtual void Draw(const glm::ivec2 & size);
 	virtual void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, GLint level, const float time = 0);

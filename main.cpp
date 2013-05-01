@@ -70,7 +70,7 @@ Sphere ball;	//normal ball
 Sphere ball2;	//hit ball
 Sphere player;
 Map ground, walls, cursor, ground2;	//map objects
-JumboTron tron;	//JumboTrons
+JumboTron tron, screen;	//JumboTrons
 vector<Sphere> balls; //balls
 vector<Obstacle> boxes;
 Skybox sky;
@@ -106,6 +106,7 @@ b2PolygonShape groundBox;
 b2BodyDef bodyDef;
 
 void DisplayFunc();
+void DisplayFunc2();
 
 GLvoid setLevel()
 {
@@ -242,6 +243,8 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 	float time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
 
 	fbo.Bind();
+	mat4 modelview;
+	//mat4 projection;
 	//glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glPushAttrib(GL_VIEWPORT_BIT | GL_TRANSFORM_BIT);
@@ -269,7 +272,7 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 	//glPopMatrix();
 	//glPopAttrib();
 	//DisplayFunc();
-	ball.Draw(p, m, window.size, window.stage);
+	ball.Draw(p, modelview, window.size, window.stage);
 	fbo.Unbind();
 
 	//fbo.Bind();
@@ -355,6 +358,7 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	ground2.TakeDown();
 	walls.TakeDown();
 	tron.TakeDown();
+	screen.TakeDown();
 	sky.TakeDown();
 	box.TakeDown();
 	score.TakeDown();
@@ -748,6 +752,8 @@ void DisplayFunc()
 
 	sky.Draw(projection, modelview, window.size, window.stage);
 
+	screen.Draw(projection, modelview, window.size, window.stage);
+
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
@@ -761,7 +767,7 @@ void DisplayFunc()
 	//glEnable(GL_DEPTH_TEST);
 	modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));
 	RenderIntoFrameBuffer(modelview, projection);
-	UseFramebufferToDrawSomething(modelview, projection);
+	//UseFramebufferToDrawSomething(modelview, projection);
 	glViewport(0, 0, window.size.x, window.size.y);
 	modelview = translate(modelview, vec3(0.0f, -5.0f, 0.0f));
 
@@ -975,6 +981,8 @@ GLint main(GLint argc, GLchar * argv[])
 	if (!walls.InitializeWalls())
 		return 0;
 	if (!tron.InitializeCylinder())
+		return 0;
+	if (!screen.InitializeScreen())
 		return 0;
 	if (!sky.Initialize())
 		return 0;
