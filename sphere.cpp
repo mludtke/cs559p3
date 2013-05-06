@@ -96,8 +96,10 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 	vec3 color = GREEN;
 	if (is_hit)
 		color = RED;
-	if (hit > 1)
+	if (hit == 2)
 		color = BLUE;
+	if (hit == 3)
+		color = GRAY;
 
 	const float increment_stacks = (3.14159f) / float(stacks_sphere);
 	const float increment_slices = (3.14159f) / slices;
@@ -262,6 +264,7 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 
 	}
 
+
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
 
@@ -295,6 +298,11 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 		if (!this->shader.Initialize("blue_shader.vert", "blue_shader.frag"))
 			return false;
 	}
+	if (shader == 2)
+	{
+		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
+			return false;
+	}
 	
 	if (this->GLReturnedError("Sphere::Initialize - on exit"))
 		return false;
@@ -318,7 +326,7 @@ void Sphere::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
+void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, GLint shade, const float time)
 {
 	if (this->GLReturnedError("Sphere::Draw - on entry"))
 		return;
@@ -328,10 +336,17 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 
-	shader.Use();
-	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-
-
+	//if (shade == 0)
+	//{
+		shader.Use();
+		shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+	//}
+	/*else
+	{
+		adsShader.Use();
+		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+		adsShader.SetMaterial(materials[MAT_RUBY].ambient, materials[MAT_RUBY].diffuse, materials[MAT_RUBY].specular, materials[MAT_RUBY].shiny);
+	}*/
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);

@@ -261,7 +261,7 @@ void Skybox::Draw(const ivec2 & size)
   assert(false);
 }
 
-void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint texture, const float time)
+void Skybox::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint texture, GLint shade, const float time)
 {
   if (this->GLReturnedError("Skybox::Draw - on entry"))
     return;

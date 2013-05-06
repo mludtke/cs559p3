@@ -54,7 +54,7 @@ bool Scoreboard::Initialize()
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
 	float stack_increment = height/(float)stacks;
 
-	VertexAttributesPCN bottomLeft, bottomRight, topLeft, topRight;
+	VertexAttributesPCNT bottomLeft, bottomRight, topLeft, topRight;
 
 	for (int i = 0; i <= stacks; i++)
 	{
@@ -147,12 +147,14 @@ bool Scoreboard::Initialize()
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) ));	// Note offset - legacy of older code
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCN), (GLvoid *) (sizeof(vec3) * 2));	// Same
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -198,6 +200,87 @@ bool Scoreboard::Initialize()
 	return true;
 }
 
+bool Scoreboard::InitializeScreen()
+{
+	if (!super::Initialize())
+		return false;
+
+	vec3 color2 = WHITE;
+
+	VertexAttributesPCNT bottomLeft, bottomRight, topLeft, topRight;
+
+	bottomLeft.texture_coordinate = vec2(0.0f, 0.25f);
+	bottomRight.texture_coordinate = vec2(1.0f, 0.25f);
+	topLeft.texture_coordinate = vec2(0.0f, 0.75f);
+	topRight.texture_coordinate = vec2(1.0f, 0.75f);
+	
+
+	bottomLeft.position = vec3(-3.0f, 5.0f, 0.21f);
+	bottomLeft.color = color2;
+	bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	bottomRight.position = vec3(3.0f, 5.0f, 0.21f);
+	bottomRight.color = color2;
+	bottomRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topRight.position = vec3(3.0f, 7.0f, 0.21f);
+	topRight.color = color2;
+	topRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	topLeft.position = vec3(-3.0f, 7.0f, 0.21f);
+	topLeft.color = color2;
+	topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+	this->vertices.push_back(bottomLeft);
+	this->vertices.push_back(bottomRight);
+	this->vertices.push_back(topRight);
+	this->vertices.push_back(topLeft);
+
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 3);
+	this->vertex_indices.push_back(vertices.size() - 4);
+			
+	this->vertex_indices.push_back(vertices.size() - 1);
+	this->vertex_indices.push_back(vertices.size() - 2);
+	this->vertex_indices.push_back(vertices.size() - 3);
+
+
+
+	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
+		return false;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	if (this->normal_vertices.size() > 0)
+	{
+		if (!this->PostGLInitialize(&this->normal_array_handle, &this->normal_coordinate_handle, this->normal_vertices.size() * sizeof(VertexAttributesP), &this->normal_vertices[0]))
+			return false;
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesP), (GLvoid *) 0);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+	}
+
+	
+	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+			return false;
+	
+
+	if (this->GLReturnedError("Scoreboard::Initialize - on exit"))
+		return false;
+
+	return true;
+}
 
 void Scoreboard::TakeDown()
 {
@@ -213,7 +296,7 @@ void Scoreboard::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
+void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, GLint shade, const float time)
 {
 	if (this->GLReturnedError("Scoreboard::Draw - on entry"))
 		return;
@@ -226,23 +309,6 @@ void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & siz
 	shader.Use();
 	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
-/*	if(shade == 2)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-
-		//adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		//adsShader.SetMaterial(vec3(0.0f, 0.0f, 0.0f), vec3(0.588235f, 0.670588f, 0.729412f), vec3(0.9f, 0.9f, 0.9f), 96.0f);
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}
-	if(shade == 3)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}*/
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);
@@ -262,4 +328,46 @@ void Scoreboard::Draw(const mat4 & projection, mat4 modelview, const ivec2 & siz
 		return;
 }
 
+void Scoreboard::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, FrameBufferObject fbo, const float time)
+{
+		if (this->GLReturnedError("screen::Draw - on entry"))
+    return;
+
+  glEnable(GL_DEPTH_TEST);
+
+  modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
+  mat4 mvp = projection * modelview;
+  mat3 nm = inverse(transpose(mat3(modelview)));
+
+  glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+
+  glEnable(GL_TEXTURE_2D);
+
+	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR);
+
+  shader.Use();
+  shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+  glBindVertexArray(this->vertex_array_handle);
+  glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
+  glBindVertexArray(0);
+  glUseProgram(0);
+
+  if (this->draw_normals)
+  {    
+    this->solid_color.Use();
+    this->solid_color.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+    glBindVertexArray(this->normal_array_handle);
+    glDrawElements(GL_LINES , this->normal_indices.size(), GL_UNSIGNED_INT , &this->normal_indices[0]);
+    glBindVertexArray(0);
+    glUseProgram(0);
+  }
+
+  if (this->GLReturnedError("Screen::Draw - on exit"))
+    return;
+
+}
 

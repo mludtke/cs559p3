@@ -48,7 +48,7 @@ bool JumboTron::InitializeCylinder()
 	y = 0.0f;
 	vec4 location;
 	vec3 color = CYAN;
-	vec3 color2 = WHITE;
+	vec3 color2 = GRAY;
 	float height = 7.0f;
 
 	const float increment_slices = (2 * 3.14159f) / (float)slices;
@@ -111,9 +111,112 @@ bool JumboTron::InitializeCylinder()
 			y -= stack_increment;
 		}
 		y += stack_increment;
+
+		if (i == 0)
+		{
+			bottomLeft.texture_coordinate = vec2(0.0f, 0.25f);
+			bottomRight.texture_coordinate = vec2(1.0f, 0.25f);
+			topLeft.texture_coordinate = vec2(0.0f, 0.75f);
+			topRight.texture_coordinate = vec2(1.0f, 0.75f);
+
+			bottomLeft.position = vec3(-5.25f, 4.75f, 0.2f);
+			bottomLeft.color = color2;
+			bottomLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+			bottomRight.position = vec3(5.25f, 4.75f, 0.2f);
+			bottomRight.color = color2;
+			bottomRight.normal =vec3(0.0f, 0.0f, -1.0f);
+
+			topRight.position = vec3(5.25f, 10.25f, 0.2f);
+			topRight.color = color2;
+			topRight.normal = vec3(0.0f, 0.0f, -1.0f);
+
+			topLeft.position = vec3(-5.25f, 10.25f, 0.2f);
+			topLeft.color = color2;
+			topLeft.normal = vec3(0.0f, 0.0f, -1.0f);
+
+			this->vertices.push_back(bottomLeft);
+			this->vertices.push_back(bottomRight);
+			this->vertices.push_back(topRight);
+			this->vertices.push_back(topLeft);
+
+			this->vertex_indices.push_back(vertices.size() - 1);
+			this->vertex_indices.push_back(vertices.size() - 3);
+			this->vertex_indices.push_back(vertices.size() - 4);
+
+			this->vertex_indices.push_back(vertices.size() - 1);
+			this->vertex_indices.push_back(vertices.size() - 2);
+			this->vertex_indices.push_back(vertices.size() - 3);
+
+
+		}
 	}
 
+	
 
+
+
+	phi = 0.0f;
+	y = height;
+	//m = translate(m, vec3(0.0f, 5.0f, 0.0f));
+
+	//Lights
+	//for (int i = 0; i <= stacks; i++)
+	//{
+	//	for (int j = 0; j < slices; j++)
+	//	{
+	//		x = radius * cos(phi);
+	//		//y = height - (height - (i * stack_increment));
+	//		z = radius * sin(phi);
+	//		location = vec4(x, y, z, 1.0f);
+
+	//		bottomLeft.position = vec3(location * m);
+	//		bottomLeft.color = color;
+	//		bottomLeft.normal = vec3(normalize(location * m));
+
+	//		phi += increment_slices;
+	//		x = radius * cos(phi);
+	//		z = radius * sin(phi);
+	//		location = vec4(x, y, z, 1.0f);
+
+	//		bottomRight.position = vec3(location * m);
+	//		bottomRight.color = color;
+	//		bottomRight.normal = vec3(normalize(location * m));
+
+	//		y = y + stack_increment;
+	//		location = vec4(x, y, z, 1.0f);
+
+	//		topRight.position = vec3(location * m);
+	//		topRight.color = color;
+	//		topRight.normal = vec3(normalize(location * m));
+
+	//		phi -= increment_slices;
+	//		x = radius * cos(phi);
+	//		z = radius * sin(phi);
+	//		location = vec4(x, y, z, 1.0f);
+
+	//		topLeft.position = vec3(location * m);
+	//		topLeft.color = color;
+	//		topLeft.normal = vec3(normalize(location * m));
+
+	//		this->vertices.push_back(bottomLeft);
+	//		this->vertices.push_back(bottomRight);
+	//		this->vertices.push_back(topRight);
+	//		this->vertices.push_back(topLeft);
+
+	//		this->vertex_indices.push_back(vertices.size() - 1);
+	//		this->vertex_indices.push_back(vertices.size() - 3);
+	//		this->vertex_indices.push_back(vertices.size() - 4);
+	//		
+	//		this->vertex_indices.push_back(vertices.size() - 1);
+	//		this->vertex_indices.push_back(vertices.size() - 2);
+	//		this->vertex_indices.push_back(vertices.size() - 3);
+
+	//		phi += increment_slices;
+	//		y -= stack_increment;
+	//	}
+	//	y += stack_increment;
+	//}
 
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
@@ -121,9 +224,11 @@ bool JumboTron::InitializeCylinder()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3)));	
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 2));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(VertexAttributesPCNT), (GLvoid *) (sizeof(vec3) * 3));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -177,28 +282,14 @@ bool JumboTron::InitializeScreen()
 	if (!super::Initialize())
 		return false;
 
-	mat4 m;
-	int slices = 20;
-	int stacks = 6;
-	const vec3 n = normalize(vec3(1.0f, 1.0f, 1.0f));
-	const float radius = 0.2f;
-	float theta = 0.0f, phi = 0.0f;
-	float x, y, z;
-	y = 0.0f;
-	vec4 location;
-	vec3 color = CYAN;
 	vec3 color2 = WHITE;
-	float height = 7.0f;
-
-	const float increment_slices = (2 * 3.14159f) / (float)slices;
-	float stack_increment = height/(float)stacks;
 
 	VertexAttributesPCNT bottomLeft, bottomRight, topLeft, topRight;
 
-	bottomLeft.texture_coordinate = vec2(0.0f, 0.0f);
-	bottomRight.texture_coordinate = vec2(1.0f, 0.0f);
-	topLeft.texture_coordinate = vec2(0.0f, 1.0f);
-	topRight.texture_coordinate = vec2(1.0f, 1.0f);
+	bottomLeft.texture_coordinate = vec2(0.0f, 0.25f);
+	bottomRight.texture_coordinate = vec2(1.0f, 0.25f);
+	topLeft.texture_coordinate = vec2(0.0f, 0.75f);
+	topRight.texture_coordinate = vec2(1.0f, 0.75f);
 	
 	bottomLeft.position = vec3(-5.0f, 5.0f, 0.21f);
 	bottomLeft.color = color2;
@@ -284,7 +375,7 @@ void JumboTron::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void JumboTron::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
+void JumboTron::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, GLint shade, const float time)
 {
 	if (this->GLReturnedError("JumboTron::Draw - on entry"))
 		return;
@@ -316,7 +407,7 @@ void JumboTron::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size
 		return;
 }
 
-void JumboTron::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 & size, FrameBufferObject fbo, const float time)
+void JumboTron::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 & size, FrameBufferObject fbo, GLint screen, const float time)
 {
 	if (this->GLReturnedError("screen::Draw - on entry"))
     return;
@@ -327,7 +418,10 @@ void JumboTron::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 
   mat4 mvp = projection * modelview;
   mat3 nm = inverse(transpose(mat3(modelview)));
 
-  glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+  if (screen == 0)
+	glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+  if (screen > 0)
+	TextureManager::Inst()->BindTexture(screen + 8, 0);
   glEnable(GL_TEXTURE_2D);
 
 	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);

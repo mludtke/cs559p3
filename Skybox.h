@@ -14,7 +14,7 @@ public:
 	Skybox();
 	bool Initialize();
 	virtual void Draw(const glm::ivec2 & size);
-	void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, GLint texture, const float time = 0);
+	void Draw(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size, GLint texture, GLint shader, const float time = 0);
 	void TakeDown();
 	TexturedShader shader;
 	Shader solid_color;  

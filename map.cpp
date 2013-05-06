@@ -595,7 +595,7 @@ void Map::Draw(const ivec2 & size)
 	assert(false);
 }
 
-void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, const float time)
+void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLint level, GLint shade, const float time)
 {
 	if (this->GLReturnedError("Floor::Draw - on entry"))
 		return;
