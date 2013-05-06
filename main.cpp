@@ -298,11 +298,9 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 //render the scoreboard into a framebuffer
 void RenderIntoFrameBuffer2(mat4 m, mat4 p)
 {
-
 	fbo2.Bind();
 	DisplayFunc3();
 	fbo2.Unbind();
-	
 }
 
 //used for testing purposes
@@ -736,333 +734,338 @@ Obstacle Object_movement(Obstacle obst, vec3 obj_pos, float force, vec3 directio
 //overall display function
 void DisplayFunc()
 {
-	int current_time = (int)(glutGet(GLUT_ELAPSED_TIME)) / (int)1000.0f;
+	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	current_time = current_time - window.total_time_paused;
 	ostringstream convert;
-	convert << current_time;
+	convert << (int)current_time;
 	string display_current_time = convert.str();
 
-	glDisable(GL_CULL_FACE);
-
-	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, window.size.x, window.size.y);
-
-	mat4 projection;
-
-	if (debug_mode != 3)
-		projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
-	else 
-		projection = perspective(35.0f, window.aspect, 1.0f, 600.0f);
-
-	radius = 20.0f;
-
-	float tempX = xpos;
-	float tempZ = zpos;
-	float tempLookatX = lookatX;
-	float tempLookatZ = lookatZ;
-
-	mat4 modelview;
-
-	//movement (with a buffer zone in center) in first person view
-	if ((debug_mode != 2 && debug_mode != 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
+	if (!window.paused)
 	{
+		glDisable(GL_CULL_FACE);
 
-		if ((xpos <= -105.0f + window.ball_radius || xpos >= 105 - window.ball_radius))	//bounce off walls
-		{
-			lookatX = xpos - (lookatX - xpos);
-			angleV = -angleV;
-		}
-		if ((zpos <= -105.0f + window.ball_radius  || zpos >= 105.0f - window.ball_radius))	//bounce off walls
-		{
-			lookatZ = zpos - (lookatZ - zpos);
-			while (angleV < 0.0f)
-				angleV = 360.0f + angleV;
-			angleV = 180 - angleV;
-		}
+		glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, window.size.x, window.size.y);
 
+		mat4 projection;
 
-		// turn right or left
-		angleV = angleV - xDiffFromCenter * 0.01f * window.stage;
-		lookatX = xpos - sin(angleV * (PI / 180)) * radius ;
-		lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
-
-		//move forward and backwards
-		xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.002f * window.stage);	//multiply by level to compensate adding more balls and
-																					//slowing down of processing them
-		zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.002f * window.stage);
-		ypos = ypos + ((0 - ypos) * 0.003f);
-		
-		zpos = clamp(zpos, -104.5f, 104.5f);
-		xpos = clamp(xpos, -104.5f, 104.5f);
-
-	}
-
-	//movement in third person view
-	if ((debug_mode == 2 || debug_mode == 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
-	{
-		angleH = angleH - xDiffFromCenter * 0.005f;
-		cameraX = sin(angleH * (PI / 180)) * 110.0f;
-		cameraZ = cos(angleH * (PI / 180)) * 110.0f;
-
-	}
-
-	//check to see if going to hit a box and calculate position
-	for (int i = 0; i < (int)boxes.size(); i++)
-	{
-		if (xpos >= (boxes.at(i).getPostion().x - window.obstacle_width/2.0f - window.ball_radius) 
-			&&  xpos <= (boxes.at(i).getPostion().x + window.obstacle_width/2.0f + window.ball_radius))
-		{
-			if (zpos >= (boxes.at(i).getPostion().z - window.obstacle_width/2.0f - window.ball_radius)
-				&& (zpos) <= (boxes.at(i).getPostion().z + window.obstacle_width/2.0f + window.ball_radius))
-			{	
-			
-				boxes.at(i).setForce(yDiffFromCenter);
-				float direction_X; 
-				direction_X = boxes.at(i).getPostion().x - xpos;
-				float direction_Z; 
-				direction_X = boxes.at(i).getPostion().z - zpos;
-				boxes.at(i).setDirection(vec3(direction_X, ypos, direction_Z));
-
-				/*cout << boxes.at(i).getPostion().x << ", " << boxes.at(i).getPostion().z << ", " << i << endl;
-				cout << "Force: " << boxes.at(i).getForce() << endl;
-				cout << "direction: " << boxes.at(i).getDirection().x << ", " << boxes.at(i).getDirection().z << endl;*/
-
-				if (zpos < boxes.at(i).getPostion().z - window.obstacle_width/2.0f || zpos > boxes.at(i).getPostion().z + window.obstacle_width/2.0f)
-				{
-					//lookatX = tempLookX;
-					lookatZ = zpos - (lookatZ - zpos);
-
-					while (angleV < 0.0f)
-						angleV = 360.0f + angleV;
-
-					angleV = 180 - angleV;
-					cout << "hit z side " << endl;
-				}
-
-				else
-				{
-					lookatX = xpos - (lookatX - xpos);
-					angleV = -angleV;
-
-					cout << "hit x side " << endl;
-				}
-				
-			}
-		}
-		//boxes.at(i) = Object_movement(boxes.at(i), boxes.at(i).getPostion(), boxes.at(i).getForce(), boxes.at(i).getDirection()); 
-	}
-
-	//check to see if hitting ball
-	for(int i = 0; i < window.num_balls; i++)
-	{
-		if (xpos  >= (balls.at(i).getPostion().x - window.ball_radius - window.ball_radius) 
-			&& (xpos)  <= (balls.at(i).getPostion().x + window.ball_radius + window.ball_radius))
-		{
-			if (zpos >= (balls.at(i).getPostion().z - window.ball_radius - window.ball_radius) 
-				&& (zpos)  <= (balls.at(i).getPostion().z + window.ball_radius + window.ball_radius))
-			{	
-				if (i == 10)
-				{
-					window.gameOver = true;
-					xpos = tempX;
-					zpos = tempZ;
-					debug_mode = 2;
-				}
-
-				balls.at(i).hit(30.0f + (float)window.num_balls * 2.0f); // set the timer for the ball
-
-				lookatZ = zpos - (lookatZ - zpos);
-				lookatX = xpos - (lookatX - xpos);
-
-				//use pythagorean theorem and law of cosines to find angle
-				float distanceA = sqrt(pow((balls.at(i).getPostion().x - xpos), 2) + pow((balls.at(i).getPostion().z - zpos), 2));
-				float distanceB = sqrt(pow((lookatX - balls.at(i).getPostion().x), 2) + pow((lookatZ - balls.at(i).getPostion().z), 2));
-				float distanceC = sqrt(pow((xpos - lookatX), 2) + pow((zpos - lookatZ), 2));
-
-				float angleTemp = acos((pow(distanceB, 2) - pow(distanceA, 2) - pow(distanceC, 2)) / (2 * distanceA * distanceC));
-
-				cout << "original: " << angleV << endl;
-				cout << "angleTemp: " << angleTemp << endl;
-				if (angleV >= 0.0f)
-					angleV = angleV + 90 - angleTemp * 5.0f;
-				else
-					angleV = angleV + 90 - angleTemp * 5.0f;
-				cout << "new angle: " << angleV << endl;
-			}
-		}
-	}
-
-	
-	if (debug_mode == 1)
-	{
-		modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, ypos, lookatZ), vec3(0.0f, 1.0f, 0.0f));
-	}
-	else if (debug_mode == 2)
-	{
-		modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	}
-	else if (debug_mode == 3)
-	{
-		modelview = lookAt(vec3(0.1f, 400.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	}
-	else
-	{
-		modelview = lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(cameraX, 0.0f, cameraZ), vec3(0.0f, 1.0f, 0.0f));
-	}
-	
-	//FrameBuffering
-	RenderIntoFrameBuffer(modelview, projection);
-	glViewport(0, 0, window.size.x, window.size.y);
-
-	/*RenderIntoFrameBuffer2(modelview, projection);
-	glViewport(0, 0, window.size.x, window.size.y);*/
-
-	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
-
-	//Draw skybox
-	if (debug_mode != 3)
-		sky.Draw(projection, modelview, window.size, window.stage, window.shader);
-
-	//Draw map elements (ground and walls)
-	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
-	walls.Draw_walls(projection, modelview, window.size);
-	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
-
-	//Draw jumbotrons and scoreboards
-	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
-	tron.Draw(projection, modelview, window.size, window.stage, window.shader);
-	screen.DrawScreen(projection, modelview, window.size, fbo, 0);
-	modelview = translate(modelview, vec3(0.0f, 4.5f, -0.2f));
-	screen.DrawScreen(projection, modelview, window.size, fbo, 5); //Draw one jumbotron with the field name
-	modelview = translate(modelview, vec3(0.0f, -4.5f, 0.2f));
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
-	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
-	tron.Draw(projection, modelview, window.size, window.stage, window.shader);
-	screen.DrawScreen(projection, modelview, window.size, fbo, 0);
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
-	modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
-	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
-	/*score.Draw(projection, modelview, window.size, window.stage, window.shader);
-	scoreScreen.DrawScreen(projection, modelview, window.size, window.stage, fbo2); */
-	tron.Draw(projection, modelview, window.size, window.stage, window.shader);
-	screen.DrawScreen(projection, modelview, window.size, fbo, 0);
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
-	modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
-	modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
-	//score.Draw(projection, modelview, window.size, window.stage, window.shader);
-	tron.Draw(projection, modelview, window.size, window.stage, window.shader);
-	screen.DrawScreen(projection, modelview, window.size, fbo, 0);
-	modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
-	modelview = rotate(modelview, -90.0f, vec3(0.0f, 1.0f, 0.0f));
-
-	//Draw player (and other objects)
-	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
-	modelview = translate(modelview, vec3(xpos, ypos, zpos));
-	player.Draw(projection, modelview, window.size, window.stage, window.shader);
-	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
-
-	window.num_hit = 0;
-	for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
-	{
-		modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
-		if (i == 10)
-		{
-			bomb.Draw(projection, modelview, window.size, window.stage, window.shader);
-		}
-		else if (balls.at(i).is_sphere_hit())
-		{
-			ball2.Draw(projection, modelview, window.size, window.stage, window.shader);
-			balls.at(i).setTime(balls.at(i).getTime() - 0.001f);
-			DisplayTime(modelview, projection, balls.at(i).getTime(), balls.at(i).getPostion());
-			window.num_hit++;
-		}
+		if (debug_mode != 3)
+			projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
 		else 
+			projection = perspective(35.0f, window.aspect, 1.0f, 600.0f);
+
+		radius = 20.0f;
+
+		float tempX = xpos;
+		float tempZ = zpos;
+		float tempLookatX = lookatX;
+		float tempLookatZ = lookatZ;
+
+		mat4 modelview;
+
+		//movement (with a buffer zone in center) in first person view
+		if ((debug_mode != 2 && debug_mode != 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f || yDiffFromCenter > 0.5f || yDiffFromCenter < -0.5f))
 		{
-			ball.Draw(projection, modelview, window.size, window.stage, window.shader);
+
+			if ((xpos <= -105.0f + window.ball_radius || xpos >= 105 - window.ball_radius))	//bounce off walls
+			{
+				lookatX = xpos - (lookatX - xpos);
+				angleV = -angleV;
+			}
+			if ((zpos <= -105.0f + window.ball_radius  || zpos >= 105.0f - window.ball_radius))	//bounce off walls
+			{
+				lookatZ = zpos - (lookatZ - zpos);
+				while (angleV < 0.0f)
+					angleV = 360.0f + angleV;
+				angleV = 180 - angleV;
+			}
+
+
+			// turn right or left
+			angleV = angleV - xDiffFromCenter * 0.01f * window.stage;
+			lookatX = xpos - sin(angleV * (PI / 180)) * radius ;
+			lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
+
+			//move forward and backwards
+			xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.002f * window.stage);	//multiply by level to compensate adding more balls and
+			//slowing down of processing them
+			zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.002f * window.stage);
+			ypos = ypos + ((0 - ypos) * 0.003f);
+
+			zpos = clamp(zpos, -104.5f, 104.5f);
+			xpos = clamp(xpos, -104.5f, 104.5f);
+
 		}
-		modelview = translate(modelview, -balls.at(i).getPostion());
-	}
 
-	if (window.num_balls - window.num_hit != window.num_remaining)
-	{
-		window.num_remaining = window.num_balls - window.num_hit;
-		ostringstream convert3;
-		ostringstream convert2;
-		convert3 << window.num_remaining;
-		convert2 << window.num_balls;
-		displayNumRemaining = convert3.str();
-		displayNumBalls = convert2.str();
-
-		window.instructions.pop_back();
-		window.instructions.pop_back();
-		window.instructions.push_back("Targets remaining: " + displayNumRemaining + " / " + displayNumBalls);
-		window.instructions.push_back("Time played: " + display_current_time);
-
-		if (window.num_remaining == 0 )
+		//movement in third person view
+		if ((debug_mode == 2 || debug_mode == 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
 		{
-			ostringstream convert4;
-			window.stage++;
-			debug_mode = 2;
-			window.betweenLevels = true;
-			setLevel();
-			convert4.clear();
-			convert4 << window.stage;
-			displayLevel = convert4.str();
+			angleH = angleH - xDiffFromCenter * 0.005f;
+			cameraX = sin(angleH * (PI / 180)) * 110.0f;
+			cameraZ = cos(angleH * (PI / 180)) * 110.0f;
+
+		}
+
+		//check to see if going to hit a box and calculate position
+		for (int i = 0; i < (int)boxes.size(); i++)
+		{
+			if (xpos >= (boxes.at(i).getPostion().x - window.obstacle_width/2.0f - window.ball_radius) 
+				&&  xpos <= (boxes.at(i).getPostion().x + window.obstacle_width/2.0f + window.ball_radius))
+			{
+				if (zpos >= (boxes.at(i).getPostion().z - window.obstacle_width/2.0f - window.ball_radius)
+					&& (zpos) <= (boxes.at(i).getPostion().z + window.obstacle_width/2.0f + window.ball_radius))
+				{	
+
+					boxes.at(i).setForce(yDiffFromCenter);
+					float direction_X; 
+					direction_X = boxes.at(i).getPostion().x - xpos;
+					float direction_Z; 
+					direction_X = boxes.at(i).getPostion().z - zpos;
+					boxes.at(i).setDirection(vec3(direction_X, ypos, direction_Z));
+
+					/*cout << boxes.at(i).getPostion().x << ", " << boxes.at(i).getPostion().z << ", " << i << endl;
+					cout << "Force: " << boxes.at(i).getForce() << endl;
+					cout << "direction: " << boxes.at(i).getDirection().x << ", " << boxes.at(i).getDirection().z << endl;*/
+
+					if (zpos < boxes.at(i).getPostion().z - window.obstacle_width/2.0f || zpos > boxes.at(i).getPostion().z + window.obstacle_width/2.0f)
+					{
+						//lookatX = tempLookX;
+						lookatZ = zpos - (lookatZ - zpos);
+
+						while (angleV < 0.0f)
+							angleV = 360.0f + angleV;
+
+						angleV = 180 - angleV;
+						cout << "hit z side " << endl;
+					}
+
+					else
+					{
+						lookatX = xpos - (lookatX - xpos);
+						angleV = -angleV;
+
+						cout << "hit x side " << endl;
+					}
+
+				}
+			}
+			//boxes.at(i) = Object_movement(boxes.at(i), boxes.at(i).getPostion(), boxes.at(i).getForce(), boxes.at(i).getDirection()); 
+		}
+
+		//check to see if hitting ball
+		for(int i = 0; i < window.num_balls; i++)
+		{
+			if (xpos  >= (balls.at(i).getPostion().x - window.ball_radius - window.ball_radius) 
+				&& (xpos)  <= (balls.at(i).getPostion().x + window.ball_radius + window.ball_radius))
+			{
+				if (zpos >= (balls.at(i).getPostion().z - window.ball_radius - window.ball_radius) 
+					&& (zpos)  <= (balls.at(i).getPostion().z + window.ball_radius + window.ball_radius))
+				{	
+					if (i == 10)
+					{
+						window.gameOver = true;
+						xpos = tempX;
+						zpos = tempZ;
+						debug_mode = 2;
+					}
+
+					balls.at(i).hit(30.0f + (float)window.num_balls * 2.0f); // set the timer for the ball
+
+					lookatZ = zpos - (lookatZ - zpos);
+					lookatX = xpos - (lookatX - xpos);
+
+					//use pythagorean theorem and law of cosines to find angle
+					float distanceA = sqrt(pow((balls.at(i).getPostion().x - xpos), 2) + pow((balls.at(i).getPostion().z - zpos), 2));
+					float distanceB = sqrt(pow((lookatX - balls.at(i).getPostion().x), 2) + pow((lookatZ - balls.at(i).getPostion().z), 2));
+					float distanceC = sqrt(pow((xpos - lookatX), 2) + pow((zpos - lookatZ), 2));
+
+					float angleTemp = acos((pow(distanceB, 2) - pow(distanceA, 2) - pow(distanceC, 2)) / (2 * distanceA * distanceC));
+
+					cout << "original: " << angleV << endl;
+					cout << "angleTemp: " << angleTemp << endl;
+					if (angleV >= 0.0f)
+						angleV = angleV + 90 - angleTemp * 5.0f;
+					else
+						angleV = angleV + 90 - angleTemp * 5.0f;
+					cout << "new angle: " << angleV << endl;
+				}
+			}
+		}
+
+
+		if (debug_mode == 1)
+		{
+			modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, ypos, lookatZ), vec3(0.0f, 1.0f, 0.0f));
+		}
+		else if (debug_mode == 2)
+		{
+			modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+		}
+		else if (debug_mode == 3)
+		{
+			modelview = lookAt(vec3(0.1f, 400.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+		}
+		else
+		{
+			modelview = lookAt(vec3(0.0f, 0.0f, 0.0f), vec3(cameraX, 0.0f, cameraZ), vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		//FrameBuffering
+		RenderIntoFrameBuffer(modelview, projection);
+		glViewport(0, 0, window.size.x, window.size.y);
+
+		/*RenderIntoFrameBuffer2(modelview, projection);
+		glViewport(0, 0, window.size.x, window.size.y);*/
+
+		glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+		//Draw skybox
+		if (debug_mode != 3)
+			sky.Draw(projection, modelview, window.size, window.stage, window.shader);
+
+		//Draw map elements (ground and walls)
+		modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+		ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
+		walls.Draw_walls(projection, modelview, window.size);
+		modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
+
+		//Draw jumbotrons and scoreboards
+		modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+		tron.Draw(projection, modelview, window.size, window.stage, window.shader);
+		screen.DrawScreen(projection, modelview, window.size, fbo, 0);
+		modelview = translate(modelview, vec3(0.0f, 4.5f, -0.2f));
+		screen.DrawScreen(projection, modelview, window.size, fbo, 5); //Draw one jumbotron with the field name
+		modelview = translate(modelview, vec3(0.0f, -4.5f, 0.2f));
+		modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+		modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+		modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+		tron.Draw(projection, modelview, window.size, window.stage, window.shader);
+		screen.DrawScreen(projection, modelview, window.size, fbo, 0);
+		modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+		modelview = rotate(modelview, 90.0f, vec3(0.0f, 1.0f, 0.0f));
+		modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+		/*score.Draw(projection, modelview, window.size, window.stage, window.shader);
+		scoreScreen.DrawScreen(projection, modelview, window.size, window.stage, fbo2); */
+		tron.Draw(projection, modelview, window.size, window.stage, window.shader);
+		screen.DrawScreen(projection, modelview, window.size, fbo, 0);
+		modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+		modelview = rotate(modelview, 180.0f, vec3(0.0f, 1.0f, 0.0f));
+		modelview = translate(modelview, vec3(0.0f, 0.0f, -107.0f));
+		//score.Draw(projection, modelview, window.size, window.stage, window.shader);
+		tron.Draw(projection, modelview, window.size, window.stage, window.shader);
+		screen.DrawScreen(projection, modelview, window.size, fbo, 0);
+		modelview = translate(modelview, vec3(0.0f, 0.0f, 107.0f));
+		modelview = rotate(modelview, -90.0f, vec3(0.0f, 1.0f, 0.0f));
+
+		//Draw player (and other objects)
+		modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+		modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
+		modelview = translate(modelview, vec3(xpos, ypos, zpos));
+		player.Draw(projection, modelview, window.size, window.stage, window.shader);
+		modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
+
+		window.num_hit = 0;
+		for (int i = 0; i < (int)balls.size(); i++)	//places the desired number of balls on field
+		{
+			modelview = translate(modelview, balls.at(i).getPostion());	//places in random location
+			if (i == 10)
+			{
+				bomb.Draw(projection, modelview, window.size, window.stage, window.shader);
+			}
+			else if (balls.at(i).is_sphere_hit())
+			{
+				ball2.Draw(projection, modelview, window.size, window.stage, window.shader);
+				balls.at(i).setTime(balls.at(i).getTime() - 0.001f);
+				DisplayTime(modelview, projection, balls.at(i).getTime(), balls.at(i).getPostion());
+				window.num_hit++;
+			}
+			else 
+			{
+				ball.Draw(projection, modelview, window.size, window.stage, window.shader);
+			}
+			modelview = translate(modelview, -balls.at(i).getPostion());
+		}
+
+		if (window.num_balls - window.num_hit != window.num_remaining)
+		{
+			window.num_remaining = window.num_balls - window.num_hit;
+			ostringstream convert3;
+			ostringstream convert2;
+			convert3 << window.num_remaining;
+			convert2 << window.num_balls;
+			displayNumRemaining = convert3.str();
+			displayNumBalls = convert2.str();
+
 			window.instructions.pop_back();
 			window.instructions.pop_back();
-			window.instructions.pop_back();
-			window.instructions.push_back("Level: " + displayLevel);
 			window.instructions.push_back("Targets remaining: " + displayNumRemaining + " / " + displayNumBalls);
 			window.instructions.push_back("Time played: " + display_current_time);
+
+			if (window.num_remaining == 0 )
+			{
+				ostringstream convert4;
+				window.stage++;
+				debug_mode = 2;
+				window.betweenLevels = true;
+				setLevel();
+				convert4.clear();
+				convert4 << window.stage;
+				displayLevel = convert4.str();
+				window.instructions.pop_back();
+				window.instructions.pop_back();
+				window.instructions.pop_back();
+				window.instructions.push_back("Level: " + displayLevel);
+				window.instructions.push_back("Targets remaining: " + displayNumRemaining + " / " + displayNumBalls);
+				window.instructions.push_back("Time played: " + display_current_time);
+			}
 		}
+
+		modelview = translate(modelview, vec3(0.0f, -window.ball_radius, 0.0f));
+		for (int i = 0; i < (int)boxes.size(); i++)	//places the desired number of obstacles on field
+		{
+			modelview = translate(modelview, boxes.at(i).getPostion());	//places in random location
+			box.Draw(projection, modelview, window.size, window.stage, window.shader);
+			modelview = translate(modelview, -boxes.at(i).getPostion());
+		}
+
+		if (!window.gameStart) //Display start screen
+		{
+			modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
+			modelview = scale(modelview, vec3(3.0f, 2.0f, 3.0f));
+			screen.DrawScreen(projection, modelview, window.size, fbo, 1); //Display intro screen 
+		}
+
+		if (window.betweenLevels) //Display next level screen
+		{
+			modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
+			screen.DrawScreen(projection, modelview, window.size, fbo, 2);
+		}
+
+		if (window.gameOver) //Display losing screen
+		{
+			modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
+			screen.DrawScreen(projection, modelview, window.size, fbo, 3);
+		}
+		if (window.gameWon)
+		{
+			modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
+			screen.DrawScreen(projection, modelview, window.size, fbo, 4);
+		}
+
+		window.instructions.pop_back();
+		window.instructions.push_back("Time played: " + display_current_time);
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		DisplayInstructions();
+
+		DisplayCursor();
+
+		//display the minimap
+		if (window.minimap)
+			DisplayFunc2();
+
 	}
-	
-	modelview = translate(modelview, vec3(0.0f, -window.ball_radius, 0.0f));
-	for (int i = 0; i < (int)boxes.size(); i++)	//places the desired number of obstacles on field
-	{
-		modelview = translate(modelview, boxes.at(i).getPostion());	//places in random location
-		box.Draw(projection, modelview, window.size, window.stage, window.shader);
-		modelview = translate(modelview, -boxes.at(i).getPostion());
-	}
-
-	if (!window.gameStart) //Display start screen
-	{
-		modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
-		modelview = scale(modelview, vec3(3.0f, 2.0f, 3.0f));
-		screen.DrawScreen(projection, modelview, window.size, fbo, 1); //Display intro screen 
-	}
-
-	if (window.betweenLevels) //Display next level screen
-	{
-		modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
-		screen.DrawScreen(projection, modelview, window.size, fbo, 2);
-	}
-
-	if (window.gameOver) //Display losing screen
-	{
-		modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
-		screen.DrawScreen(projection, modelview, window.size, fbo, 3);
-	}
-	if (window.gameWon)
-	{
-		modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
-		screen.DrawScreen(projection, modelview, window.size, fbo, 4);
-	}
-
-	window.instructions.pop_back();
-	window.instructions.push_back("Time played: " + display_current_time);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	DisplayInstructions();
-
-	DisplayCursor();
-
-	//display the minimap
-	if (window.minimap)
-		DisplayFunc2();
 
 	glFlush();
 	glutPostRedisplay(); // FPS
