@@ -24,53 +24,55 @@
     <None Include="glew32.dll" />
     <None Include="README.md" />
     <None Include="basic_texture_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="basic_texture_shader.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="blue_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="blue_shader.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="gouraud_shader.frag">
-      <Filter>Texture Files</Filter>
-    </None>
-    <None Include="phong_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="gouraud_shader.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="phong_shader.frag">
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="phong_shader.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="rainbow.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="rainbow.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="solid_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="solid_shader.vert">
-      <Filter>Texture Files</Filter>
-    </None>
-    <None Include="text_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="text_shader.vert">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
-    <None Include="water_shader.vert">
-      <Filter>Texture Files</Filter>
+    <None Include="text_shader.frag">
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="water_shader.frag">
-      <Filter>Texture Files</Filter>
+      <Filter>Shader Files</Filter>
     </None>
+    <None Include="water_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="light.frag" />
+    <None Include="light.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="advertisments.jpg">
@@ -168,19 +170,16 @@
     <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SkyboxM.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="sphere.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="vertexattributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

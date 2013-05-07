@@ -92,6 +92,8 @@
     <None Include="glew32.dll" />
     <None Include="gouraud_shader.frag" />
     <None Include="gouraud_shader.vert" />
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="phong_shader.frag" />
     <None Include="phong_shader.vert" />
     <None Include="rainbow.frag" />
@@ -130,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="constants.h" />
     <ClInclude Include="fbo.h" />
+    <ClInclude Include="FreeImage.h" />
     <ClInclude Include="JumboTron.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="map.h" />
@@ -138,9 +141,7 @@
     <ClInclude Include="Scoreboard.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="Skybox.h" />
-    <ClInclude Include="SkyboxM.h" />
     <ClInclude Include="sphere.h" />
-    <ClInclude Include="Text.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="vertexattributes.h" />
   </ItemGroup>

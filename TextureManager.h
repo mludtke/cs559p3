@@ -1,4 +1,3 @@
-
 //**********************************************
 //Singleton Texture Manager class
 //Written by Ben English
