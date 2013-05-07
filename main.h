@@ -48,6 +48,7 @@ public:
 	GLboolean gameStart; //if game has started
 	GLboolean betweenLevels; //if between levels
 	GLboolean minimap; //if showing minimap
+	GLboolean hit_something; //if had hit something
 	GLint slices;	//number of slices
 	GLint stacks;	//number of stacks
 	GLint shader;	//current shader

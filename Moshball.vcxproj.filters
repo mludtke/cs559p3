@@ -223,5 +223,8 @@
     <Image Include="field.jpg">
       <Filter>Texture files</Filter>
     </Image>
+    <Image Include="Broken-glass.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

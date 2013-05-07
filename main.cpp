@@ -18,9 +18,6 @@ void DisplayTime(mat4 modelview, mat4 projection, float time, vec3 position)
 	glColor3f(0.0f, 0.0f, 0.0f);
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(value_ptr(projection));
-	//glLoadIdentity();
-	//glOrtho(0, window.size.x / 2.0, 0, window.size.y / 2.0, 1, 10);
-	//glOrtho();
 	glViewport(0, 0, window.size.x, window.size.y);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(value_ptr(modelview));
@@ -527,6 +524,7 @@ void DisplayFunc()
 			{
 				lookatX = xpos - (lookatX - xpos);
 				angleV = -angleV;
+				window.hit_something = true;
 			}
 			if ((zpos <= -105.0f + window.ball_radius  || zpos >= 105.0f - window.ball_radius))	//bounce off walls
 			{
@@ -534,6 +532,7 @@ void DisplayFunc()
 				while (angleV < 0.0f)
 					angleV = 360.0f + angleV;
 				angleV = 180 - angleV;
+				window.hit_something = true;
 			}
 
 
@@ -578,6 +577,8 @@ void DisplayFunc()
 					float direction_Z; 
 					direction_X = boxes.at(i).getPostion().z - zpos;
 					boxes.at(i).setDirection(vec3(direction_X, ypos, direction_Z));
+
+					window.hit_something = true;
 
 					/*cout << boxes.at(i).getPostion().x << ", " << boxes.at(i).getPostion().z << ", " << i << endl;
 					cout << "Force: " << boxes.at(i).getForce() << endl;
@@ -922,6 +923,7 @@ GLint main(GLint argc, GLchar * argv[])
 	window.betweenLevels = false;
 	window.shader = 0;
 	window.minimap = true;
+	window.hit_something = false;
 
 	glutInit(&argc, argv);
 	glutInitWindowSize(1300, 960);
@@ -1015,6 +1017,7 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(TextureManager::Inst()->LoadTexture((const char *) "you_won.jpg", 12));
 
 	assert(TextureManager::Inst()->LoadTexture((const char *) "field.jpg", 13));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "broken-glass.jpg", 14));
 
 	glutMainLoop();
 	system("pause");

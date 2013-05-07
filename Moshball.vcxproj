@@ -136,6 +136,7 @@
   <ItemGroup>
     <Image Include="advertisments.jpg" />
     <Image Include="blue-sky-texture.jpg" />
+    <Image Include="Broken-glass.jpg" />
     <Image Include="cloudy.jpg" />
     <Image Include="cubemap.jpg" />
     <Image Include="field.jpg" />
