@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2f4d04a9-46ed-44c1-8702-23c4fe35d488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vertexattributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JumboTron.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Obstacle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scoreboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vertexattributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JumboTron.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Obstacle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scoreboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
+    <None Include="basic_texture_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="blue_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="blue_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="phong_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="phong_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="solid_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="solid_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="text_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="text_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="rainbow.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="rainbow.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="water_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="water_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="gouraud_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="gouraud_shader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="basic_texture_shader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="light.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="light.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="clock.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="clock.vert">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="stone.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="blue-sky-texture.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="cubemap.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="grass.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="simpson_skybox.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="lava.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="cloudy.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="garden_sky.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="spheremapgalaxyasteroid.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="metalplate.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="fulllg.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="sunset.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="winner.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="introScreen.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="nextLevel.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="you_lost.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="interstellar_large.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="you_won.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="red_mountain.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="advertisments.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="field.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

@@ -1,13 +1,12 @@
 # Visual Studio files #
 ######################
+Release/
 Debug/
 *.sdf
 *.opensdf
 *.user
 *.suo
 *.sln
-*.vcxproj
-*.filters
 
 # OS generated files #
 ######################
