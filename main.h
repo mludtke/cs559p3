@@ -1,0 +1,246 @@
+#include <iostream>
+#include <cassert>
+#include <vector>
+#include <gl/glew.h>
+#include <gl/freeglut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
+//#include "background.h"
+#include "sphere.h"
+#include "map.h"
+#include "JumboTron.h"
+#include "Skybox.h"
+//#include "Box2D\Box2D.h"
+#include "Obstacle.h"
+#include "Scoreboard.h"
+
+#include "fbo.h"
+
+using namespace std;
+using namespace glm;
+
+class Window
+{
+public:
+	Window()
+	{
+		this->time_last_pause_began = this->total_time_paused = 0;
+		this->normals = this->wireframe = this->paused = false;
+		this->slices = 20;
+		this->interval = 1000 / 120;
+		this->handle = -1;
+		this->stacks = 20;
+		this->shader = 0;
+		this->title  = "MoshBall";
+	}
+
+	GLfloat time_last_pause_began;
+	GLfloat total_time_paused;
+	GLboolean paused , wireframe, normals;
+	GLint handle;
+	GLint interval;
+	GLint FPS;
+	GLboolean gameWon; //If game was won
+	GLboolean gameOver; //if game was lost
+	GLboolean gameStart; //if game has started
+	GLboolean betweenLevels; //if between levels
+	GLboolean minimap; //if showing minimap
+	GLint slices;	//number of slices
+	GLint stacks;	//number of stacks
+	GLint shader;	//current shader
+	GLint num_balls;	//number of balls on field
+	GLfloat ball_radius;	//radius of the balls on the field
+	GLfloat obstacle_height, obstacle_width;	//dimensions of obstacles on field
+	GLint num_boxes;	//number of obstacles on field
+	GLint num_hit;	//current number of hit items
+	GLint num_remaining;
+	GLint stage;	//level of playing
+	string title;
+	ivec2 size, center;
+	GLfloat aspect;
+	vector<string> instructions;	//text on screen
+	vector<string> plus_sign;
+} window, window2;
+
+//create objects
+Sphere ball;	//normal ball
+Sphere ball2;	//hit ball
+Sphere player;  //The players ball
+Sphere bomb;
+Map ground, walls, cursor, ground2;	//map objects
+JumboTron tron, screen;	//JumboTrons
+vector<Sphere> balls; //balls
+vector<Obstacle> boxes;
+Skybox sky;
+Sphere baller;
+Obstacle crate;
+Obstacle box;
+Scoreboard score;
+Scoreboard scoreScreen;
+FrameBufferObject fbo; // jumbotron framebuffer
+FrameBufferObject fbo2;
+
+string displayNumRemaining;
+string displayNumBalls;
+string displayLevel;
+
+static GLfloat xrot = 0.0f, yrot = 0.0f; //used for mouse movement
+static GLfloat xdiff = 0.0f, ydiff = 0.0f;	//used for mouse movement (old)
+GLfloat radius, xpos, ypos, zpos;	//used for camera movement
+GLfloat angleH, angleV;	//ditto
+GLfloat cameraX, cameraZ;
+GLfloat lookatX = 0.0f, lookatY = 0.0f, lookatZ = 0.0f; //first person camera movement
+
+float PI = 3.1415926f;
+
+GLfloat xDiffFromCenter, yDiffFromCenter; //used for mouse movement
+GLint facing_direction = 1;
+
+int debug_mode = 1;	//keeps track of what debug mode it is in
+
+//box2D
+//b2BodyDef groundBodyDef;
+//b2PolygonShape groundBox;
+//b2BodyDef bodyDef;
+
+void DisplayFunc();
+void DisplayFunc2();
+void DisplayFunc3();
+
+GLvoid setLevel()
+{
+	if (window.stage == 7)
+	{
+		window.gameWon = true;
+		debug_mode = 2;
+	}
+	window.num_balls = window.stage * 2 + 5;
+	window.num_boxes = window.stage + 2;
+	//window.ball_radius = window.ball_radius - 0.1f;
+	xpos = 0.0f;
+	ypos = 0.0f;
+	zpos = 20.0f;
+
+	angleV = 0.0f;
+
+	ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, 0.00f);
+
+	ball2.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, 0.00f);
+	
+	player.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 2, 0.00f);	//hit = 2 to show not a playing object
+
+	srand (0);		//seed generator
+	for (int i = 0; i < window.num_balls; i++)
+	{
+		balls.push_back(baller);
+
+		int rand_int = rand() % 200 - 100;
+		float rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberX = rand_float + float(rand_int);
+		rand_int = rand() % 200 - 100;
+		rand_float = ((float) rand()) / (float) RAND_MAX;
+		float rand_numberZ = rand_float + float(rand_int);
+		
+		balls.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
+
+		balls.at(i).setTime(0.0f);
+	}
+
+	for (int i = 0; i < window.num_boxes; i++)
+	{
+		boxes.push_back(crate);
+		int rand_int = rand() % 200 - 100;
+		float rand_numberX = float(rand_int);
+		rand_int = rand() % 200 - 100;
+		float rand_numberZ = float(rand_int);
+
+		boxes.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
+		boxes.at(i).setForce(0.0f);
+		boxes.at(i).setDirection(vec3(0.0f, 0.0f, 0.0f));
+	}
+}
+
+//display center cursor
+void DisplayCursor()
+{
+	if (window.handle == -1)
+		return;
+
+	vector<string> * s = &window.plus_sign;
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_DEPTH_TEST);
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, window.size.x, 0, window.size.y, 1, 10);
+	glViewport(0, 0, window.size.x, window.size.y);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslated(window.size.x / 2.0 - 30, window.size.y / 2.0 - 30, -5.5);
+	glScaled(0.6, 0.6, 1.0);
+	glLineWidth(3.0f);
+	for (auto i = s->begin(); i < s->end(); ++i)
+	{
+		glPushMatrix();
+		glutStrokeString(GLUT_STROKE_MONO_ROMAN, (const unsigned char *) (*i).c_str());
+		glPopMatrix();
+		glTranslated(0, -150, 0);
+	}
+	glLineWidth(1.0f);
+}
+
+//used for testing purposes
+void Axes()
+{
+	GLUquadric * q = gluNewQuadric();
+
+	glPushMatrix();
+	glScalef(0.5f, 0.5f, 0.5f);
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPushMatrix();
+	glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+	gluCylinder(q, 0.02, 0.02, 1.0, 10, 10);
+	glTranslatef(0.0f, 0.0f, 1.0f);
+	gluSphere(q, 0.02, 10, 10);
+	glPopMatrix();
+
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glPushMatrix();
+	glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+	gluCylinder(q, 0.02, 0.02, 1.0, 10, 10);
+	glTranslatef(0.0f, 0.0f, 1.0f);
+	gluSphere(q, 0.02, 10, 10);
+	glPopMatrix();
+
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(q, 0.02, 0.02, 1.0, 10, 10);
+	glTranslatef(0.0f, 0.0f, 1.0f);
+	gluSphere(q, 0.02, 10, 10);
+	glPopMatrix();
+	glColor3f(1.0f, 1.0f, 1.0f);
+	gluSphere(q, 0.011, 10, 10);
+	gluDeleteQuadric(q);
+}
+
+//Render a screen into a framebuffer
+void RenderIntoFrameBuffer(mat4 m, mat4 p)
+{
+
+	fbo.Bind();
+	DisplayFunc3();
+	fbo.Unbind();
+	
+}
+
+//render the scoreboard into a framebuffer
+void RenderIntoFrameBuffer2(mat4 m, mat4 p)
+{
+	fbo2.Bind();
+	DisplayFunc3();
+	fbo2.Unbind();
+}

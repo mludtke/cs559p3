@@ -7,7 +7,7 @@ in vec3 position;
 in vec3 normal;
 
 const float shininess = 20.0f;
-const vec3 light_position = vec3(0.0, 0.0, 0.0);
+const vec3 light_position = vec3(0.0, 10.0, 0.0);
 
 vec3 ads( )
 {

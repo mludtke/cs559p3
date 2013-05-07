@@ -46,7 +46,7 @@ bool Map::InitializeFloor(bool minimap)
 	vec4 location;
 	vec3 color;
 	if (!minimap)
-		color = GREEN;
+		color = BLUE;
 	else
 	    color = GREEN;
 	vec3 normal_floor = vec3(0.0f, 1.0f, 0.0f);

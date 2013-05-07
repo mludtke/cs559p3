@@ -1,7 +1,3 @@
-/*	
-
-*/
-
 #include <iostream>
 #include "Sphere.h"
 
@@ -10,12 +6,13 @@ using namespace glm;
 
 Sphere::Sphere() : Object()
 {
-	vec4 lighter_color(MakeColor(255, 69, 0, 1.0f));
-	vec4 darker_color = vec4(vec3(lighter_color) /* 2.0f / 3.0f*/, 1.0f);
-	this->colors[0] = lighter_color;
-	this->colors[1] = lighter_color;
+	this->shader_index = 0;
 }
 
+void Sphere::StepShader()
+{
+	this->shader_index = ++this->shader_index % this->shaders.size();
+}
 
 void Sphere::BuildNormalVisualizationGeometry()
 {
@@ -172,16 +169,16 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 			this->vertex_indices.push_back(vertices.size() - 1);
 			this->vertex_indices.push_back(vertices.size() - 3);
 			this->vertex_indices.push_back(vertices.size() - 4);
-			
+
 			this->vertex_indices.push_back(vertices.size() - 1);
 			this->vertex_indices.push_back(vertices.size() - 4);
 			this->vertex_indices.push_back(vertices.size() - 2);
-			
+
 			mesh.at(i) = cur_top_vertex;
 			mesh.at(i + stacks) = cur_bottom_vertex;
 
 			BuildNormalVisualizationGeometry();
-		
+
 		}
 		theta = 0.0f;
 		phi += increment_slices;
@@ -248,22 +245,21 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 			this->vertex_indices.push_back(vertices.size() - 1);
 			this->vertex_indices.push_back(vertices.size() - 2);
 			this->vertex_indices.push_back(vertices.size() - 3);
-			
+
 			this->vertex_indices.push_back(vertices.size() - 3);
 			this->vertex_indices.push_back(vertices.size() - 2);
 			this->vertex_indices.push_back(vertices.size() - 4);
-			
+
 			mesh.at(i) = cur_top_vertex;
 			mesh.at(i + stacks) = cur_bottom_vertex;
 
 			BuildNormalVisualizationGeometry();
-		
+
 		}
 		theta = 0.0f;
 		phi += increment_slices;
 
 	}
-
 
 	if (!this->PostGLInitialize(&this->vertex_array_handle, &this->vertex_coordinate_handle, this->vertices.size() * sizeof(VertexAttributesPCN), &this->vertices[0]))
 		return false;
@@ -288,26 +284,23 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 		glBindVertexArray(0);
 	}
 
-	if (shader == 0)
-	{
-		if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;
-	}
-	if(shader == 1)
-	{
-		if (!this->shader.Initialize("blue_shader.vert", "blue_shader.frag"))
-			return false;
-	}
-	if (shader == 2)
-	{
-		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
-			return false;
-	}
-	
+
+	if (!this->phong.Initialize("phong_shader.vert", "phong_shader.frag"))
+		return false;
+
+	if (!this->blue.Initialize("blue_shader.vert", "blue_shader.frag"))
+		return false;
+
+	if (!this->light.Initialize("light.vert", "light.frag"))
+		return false;
+
+	this->shaders.push_back(phong);
+	this->shaders.push_back(blue);
+	this->shaders.push_back(light);
+
 	if (this->GLReturnedError("Sphere::Initialize - on exit"))
 		return false;
 
-	is_hit = true;
 
 	return true;
 }
@@ -315,7 +308,9 @@ bool Sphere::Initialize(int slices, int stacks, float radius, int shader, int hi
 void Sphere::TakeDown()
 {
 	this->vertices.clear();
-	this->shader.TakeDown();
+	this->phong.TakeDown();
+	this->blue.TakeDown();
+	this->light.TakeDown();
 	this->adsShader.TakeDown();
 	this->solid_color.TakeDown();
 	super::TakeDown();
@@ -336,17 +331,21 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 
-	//if (shade == 0)
-	//{
-		shader.Use();
-		shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-	//}
-	/*else
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-		adsShader.SetMaterial(materials[MAT_RUBY].ambient, materials[MAT_RUBY].diffuse, materials[MAT_RUBY].specular, materials[MAT_RUBY].shiny);
-	}*/
+	this->shaders[this->shader_index].Use();
+	this->shaders[this->shader_index].CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+
+	if (this->shader_index == 2 && this->is_hit)
+	{		
+		light.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
+		light.SetMaterial(materials[MAT_RUBY].ambient, materials[MAT_RUBY].diffuse, materials[MAT_RUBY].specular, materials[MAT_RUBY].shiny);
+		
+	}
+	if (this->shader_index == 2 && !this->is_hit)
+	{		
+		light.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
+		light.SetMaterial(materials[MAT_EMERALD].ambient, materials[MAT_EMERALD].diffuse, materials[MAT_EMERALD].specular, materials[MAT_EMERALD].shiny);
+	}
+
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);
