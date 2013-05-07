@@ -6,8 +6,6 @@ Debug/
 *.user
 *.suo
 *.sln
-*.vcxproj
-*.filters
 
 # OS generated files #
 ######################
