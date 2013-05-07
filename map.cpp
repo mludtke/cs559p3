@@ -141,17 +141,21 @@ bool Map::InitializeFloor(bool minimap)
 	
 	if (!minimap) //special effects should not be done on minimap
 	{
-		if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;
-		/*if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
+		/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
 			return false;*/
+		if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
+			return false;
 		/*if(!this->shader.Initialize("water_shader.vert", "water_shader.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
 			return false;*/
 	}
 	else //need basic shading for the minimap
 	{
 		if (!this->shader.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
+		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
+			return false;*/
 	}
 
 	if (this->GLReturnedError("Floor::Initialize - on exit"))
@@ -608,23 +612,6 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLin
 	shader.Use();
 	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
-/*	if(shade == 2)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-
-		//adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		//adsShader.SetMaterial(vec3(0.0f, 0.0f, 0.0f), vec3(0.588235f, 0.670588f, 0.729412f), vec3(0.9f, 0.9f, 0.9f), 96.0f);
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}
-	if(shade == 3)
-	{
-		adsShader.Use();
-		adsShader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
-		adsShader.SetLight(glm::vec4(0.0f, 0.0f, 2.0f, 1.0f), glm::vec3(0.2f), glm::vec3(0.7f), vec3(0.7f));
-		adsShader.SetMaterial(vec3(0.24725f, 0.21995f, 0.0745f), vec3(0.75164f, 0.60648f, 0.22648f), vec3(0.628281f, 0.555802f, 0.366065f), 51.2f);
-	}*/
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);

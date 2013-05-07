@@ -13,11 +13,14 @@ public:
 	
 	bool Initialize(int slices, int stacks, float radius, int shader, int hit, float born_time);
 
-	void hit(float time);
+	void hit(float time, float born_time);
 	bool is_sphere_hit();
+	void reset();
 
 	float getTime();
 	void setTime(float t);
+	float getBirthTime();
+	float getEndTime();
 	glm::vec3 getPostion();
 	void setPosition(glm::vec3 pos);
 
@@ -40,5 +43,7 @@ private:
 	typedef Object super;
 	bool is_hit;
 	float time;
+	float born_time;
+	float end_time;
 	glm::vec3 position;
 };

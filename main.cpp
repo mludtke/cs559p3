@@ -302,7 +302,8 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 //Jumbotron display function
 void DisplayFunc3()
 {
-	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	current_time = current_time - window.total_time_paused;
 
 	glDisable(GL_CULL_FACE);
 
@@ -315,25 +316,15 @@ void DisplayFunc3()
 	radius = 20.0f;
 
 	mat4 modelview;
-	//if (debug_mode == 1) //game playing view
-	//{
+
 	modelview = lookAt(vec3(xpos, ypos, zpos), vec3(lookatX, ypos, lookatZ), vec3(0.0f, 1.0f, 0.0f));
-	/*}*/
-	//else if (debug_mode == 2)
-	//{
-	//	modelview = lookAt(vec3(cameraX, 30.0f, cameraZ), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	//}
-	//else
-	//{
-	//	modelview = lookAt(vec3(0.1f, 30.0f, 0.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-	//}
 
 	//Draw skybox
 	sky.Draw(projection, modelview, window.size, window.stage, window.shader);
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
+	ground.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
 	walls.Draw_walls(projection, modelview, window.size);
 	modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
@@ -400,7 +391,8 @@ void DisplayFunc3()
 //Minimap display function
 void DisplayFunc2()
 {
-	float current_time = float(glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	current_time = current_time - window.total_time_paused;
 
 	glDisable(GL_CULL_FACE);
 
@@ -425,7 +417,7 @@ void DisplayFunc2()
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	ground2.Draw(projection, modelview, window.size, window.stage, window.shader);
+	ground2.Draw(projection, modelview, ivec2(window.size.x/8, window.size.x/8), window.stage, window.shader, current_time);
 	walls.Draw_walls(projection, modelview, window.size);
 	//modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
@@ -546,14 +538,14 @@ void DisplayFunc()
 
 
 			// turn right or left
-			angleV = angleV - xDiffFromCenter * 0.1f * window.stage;
+			angleV = angleV - xDiffFromCenter * 0.1f;
 			lookatX = xpos - sin(angleV * (PI / 180)) * radius ;
 			lookatZ = zpos - cos(angleV * (PI / 180)) * radius;
 
 			//move forward and backwards
-			xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.02f * window.stage);	//multiply by level to compensate adding more balls and
+			xpos = xpos + ((lookatX - xpos) * yDiffFromCenter * 0.02f );	//multiply by level to compensate adding more balls and
 			//slowing down of processing them
-			zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.02f * window.stage);
+			zpos = zpos + ((lookatZ - zpos) * yDiffFromCenter * 0.02f);
 			ypos = ypos + ((0 - ypos) * 0.003f);
 
 			zpos = clamp(zpos, -104.5f, 104.5f);
@@ -564,7 +556,7 @@ void DisplayFunc()
 		//movement in third person view
 		if ((debug_mode == 2 || debug_mode == 0) && (xDiffFromCenter > 0.5f || xDiffFromCenter < -0.5f))
 		{
-			angleH = angleH - xDiffFromCenter * 0.005f;
+			angleH = angleH - xDiffFromCenter * 0.05f;
 			cameraX = sin(angleH * (PI / 180)) * 110.0f;
 			cameraZ = cos(angleH * (PI / 180)) * 110.0f;
 
@@ -633,7 +625,9 @@ void DisplayFunc()
 						debug_mode = 2;
 					}
 
-					balls.at(i).hit(30.0f + (float)window.num_balls * 2.0f); // set the timer for the ball
+					balls.at(i).hit(current_time + 30.0f + (float)window.num_balls * 2.0f, current_time); // set the timer for the ball
+
+					glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 					lookatZ = zpos - (lookatZ - zpos);
 					lookatX = xpos - (lookatX - xpos);
@@ -647,10 +641,10 @@ void DisplayFunc()
 
 					cout << "original: " << angleV << endl;
 					cout << "angleTemp: " << angleTemp << endl;
-					if (angleV >= 0.0f)
+					if (yDiffFromCenter >= 0.0f)
 						angleV = angleV + 90 - angleTemp * 5.0f;
 					else
-						angleV = angleV + 90 - angleTemp * 5.0f;
+						angleV = angleV - 90 - angleTemp * 5.0f;
 					cout << "new angle: " << angleV << endl;
 				}
 			}
@@ -689,7 +683,7 @@ void DisplayFunc()
 
 		//Draw map elements (ground and walls)
 		modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-		ground.Draw(projection, modelview, window.size, window.stage, GLUT_ELAPSED_TIME);
+		ground.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
 		walls.Draw_walls(projection, modelview, window.size);
 		modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
@@ -739,8 +733,9 @@ void DisplayFunc()
 			else if (balls.at(i).is_sphere_hit())
 			{
 				ball2.Draw(projection, modelview, window.size, window.stage, window.shader);
-				balls.at(i).setTime(balls.at(i).getTime() - 0.05f);
-				DisplayTime(modelview, projection, balls.at(i).getTime(), balls.at(i).getPostion());
+				balls.at(i).setTime(current_time);
+				//cout << balls.at(i).getTime()  - balls.at(i).getBirthTime() << endl;
+				DisplayTime(modelview, projection,  balls.at(i).getEndTime() - balls.at(i).getTime(), balls.at(i).getPostion());
 				window.num_hit++;
 			}
 			else 
@@ -797,9 +792,6 @@ void DisplayFunc()
 			modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
 			modelview = scale(modelview, vec3(3.0f, 2.0f, 3.0f));
 			screen.DrawScreen(projection, modelview, window.size, fbo, 1); //Display intro screen 
-			/*glDisable(GL_LIGHTING);
-			glDisable(GL_TEXTURE_2D);
-			glLoadMatrixf(modelview);*/
 		}
 
 		if (window.betweenLevels) //Display next level screen
@@ -879,8 +871,8 @@ GLvoid passiveMotionFunc(GLint x, GLint y)
 	//winY = window.size.y / 2.0f;
 
 	//the cursor's position related to the center of screen
-	xDiffFromCenter = (x - window.center.x) / 100;
-	yDiffFromCenter = (window.center.y - y) / 100;
+	xDiffFromCenter = (x - window.center.x) / 100.0f;
+	yDiffFromCenter = (window.center.y - y) / 100.0f;
 
 	if (xDiffFromCenter < -1.0f || xDiffFromCenter > 1.0f)
 		glutSetCursor(GLUT_CURSOR_LEFT_RIGHT);

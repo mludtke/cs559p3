@@ -146,7 +146,7 @@ GLvoid setLevel()
 		
 		balls.at(i).setPosition(vec3(rand_numberX, 0.0f, rand_numberZ));
 
-		balls.at(i).setTime(0.0f);
+		balls.at(i).reset();
 	}
 
 	for (int i = 0; i < window.num_boxes; i++)

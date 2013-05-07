@@ -26,13 +26,16 @@ void Sphere::BuildNormalVisualizationGeometry()
 	}
 }
 
-void Sphere::hit(float time)
+void Sphere::hit(float time, float born_time)
 {
 	if(!is_hit)
 	{
 		this->is_hit = true;
 	}
-	this->time = time;
+	this->time = 0.0f;
+	this->end_time = time;
+	this->born_time = born_time;
+	cout << "time: " << time << " Born time: " << born_time;
 }
 
 bool Sphere::is_sphere_hit()
@@ -48,10 +51,29 @@ float Sphere::getTime()
 void Sphere::setTime(float t)
 {
 	this->time = t;
-	if (t <= 0.0f)
+	if (t > this->end_time)
 	{
 		this->is_hit = false;
+		this->end_time = 0.0f;
 	}
+}
+
+void Sphere::reset()
+{
+	this->time = 0.0f;
+	this->is_hit = false;
+	this->born_time = 0.0f;
+	this->end_time = 0.0f;
+}
+
+float Sphere::getBirthTime()
+{
+	return this->born_time;
+}
+
+float Sphere::getEndTime()
+{
+	return this->end_time;
 }
 
 vec3 Sphere::getPostion()

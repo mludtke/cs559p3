@@ -33,7 +33,7 @@ Shader::Shader()
 	loaded with the CustomShader() function.
 */
 
-void Shader::CommonSetup(const float time, const GLint * size, const GLfloat * projection, const GLfloat * modelview, const GLfloat * mvp, const GLfloat * nm)
+void Shader::CommonSetup(float time, const GLint * size, const GLfloat * projection, const GLfloat * modelview, const GLfloat * mvp, const GLfloat * nm)
 {
 	glUniform1f(this->time_handle, time);
 	glUniform2iv(this->size_handle, 1, size);
