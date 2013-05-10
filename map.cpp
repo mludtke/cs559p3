@@ -10,12 +10,13 @@ using namespace glm;
 
 Map::Map() : Object()
 {
-	vec4 lighter_color(MakeColor(255, 69, 0, 1.0f));
-	vec4 darker_color = vec4(vec3(lighter_color) /* 2.0f / 3.0f*/, 1.0f);
-	this->colors[0] = lighter_color;
-	this->colors[1] = lighter_color;
+	this->shader_index = 0;
 }
 
+void Map::StepShader()
+{
+	this->shader_index = ++this->shader_index % this->shaders.size();	
+}
 
 void Map::BuildNormalVisualizationGeometry()
 {
@@ -149,22 +150,27 @@ bool Map::InitializeFloor(bool minimap, bool clock, bool floor)
 	{
 		if (!this->shader.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
-		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
-			return false;*/
+		
+		this->shaders.push_back(&shader);
 	}
 	else if (clock)
 	{
 		if(!this->shader.Initialize("clock.vert", "clock.frag"))
 			return false;
+		this->shaders.push_back(&shader);
 	}
 	else if (floor)
 	{
 		if(!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
 			return false;
 
+		this->shaders.push_back(&shader);
 	}
 	else //floor shader
 	{
+		assert(this->rainbow.Initialize("rainbow.vert", "rainbow.frag"));
+		assert(this->color_changer.Initialize("color_changer_shader.vert", "color_changer_shader.frag"));
+		assert(this->space.Initialize("space.vert", "space.frag"));
 		/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
 			return false;*/
 		/*if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
@@ -175,8 +181,11 @@ bool Map::InitializeFloor(bool minimap, bool clock, bool floor)
 			return false;*/
 		/*if(!this->shader.Initialize("color_changer_shader.vert", "color_changer_shader.frag"))
 			return false;*/
-		if(!this->shader.Initialize("space.vert", "space.frag"))
-			return false;
+		/*if(!this->shader.Initialize("space.vert", "space.frag"))
+			return false;*/
+		this->shaders.push_back(&space);
+		this->shaders.push_back(&color_changer);
+		this->shaders.push_back(&rainbow);
 	}
 
 	if (this->GLReturnedError("Floor::Initialize - on exit"))
@@ -184,7 +193,7 @@ bool Map::InitializeFloor(bool minimap, bool clock, bool floor)
 	return true;
 }
 
-bool Map::InitializeWalls()
+bool Map::InitializeWalls(bool minimap)
 {
 	if (this->GLReturnedError("Walls::Initialize - on entry"))
 		return false;
@@ -596,9 +605,11 @@ bool Map::InitializeWalls()
 	if (!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
 		return false;
 
-	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
+	if (minimap)
+	{
+		if (!this->shader.Initialize("solid_shader_white.vert", "solid_shader_white.frag"))
 		return false;
-
+	}
 	if (this->GLReturnedError("Walls::Initialize - on exit"))
 		return false;
 	return true;
@@ -630,8 +641,8 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLin
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 
-	shader.Use();
-	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+	this->shaders[this->shader_index]->Use();
+	this->shaders[this->shader_index]->CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));  
 
 	//cout << "window size: " << size << endl;
 

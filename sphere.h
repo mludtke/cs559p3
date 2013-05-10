@@ -39,7 +39,7 @@ public:
 	void StepLightPos();
 	void incX(); void incY(); void incZ();
 	void decX(); void decY(); void decZ();
-	Shader shader, phong, normal, dark;		
+	Shader shader, phong, normal, dark, gooch;		
 	ADSShader phong2, twoside, flat, perforated, time_perforated;
 	TexturedShader texture;	
 

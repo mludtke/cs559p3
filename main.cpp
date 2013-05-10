@@ -69,6 +69,7 @@ void CloseFunc()	//Makes sure everything is deleted when the window is closed
 	trueGround.TakeDown();
 	clock.TakeDown();
 	walls.TakeDown();
+	miniWalls.TakeDown();
 	tron.TakeDown();
 	screen.TakeDown();
 	sky.TakeDown();
@@ -133,6 +134,11 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 		ball2.StepShader();
 		player.StepShader();
 		bomb.StepShader();
+		break;
+
+	case 'F':
+	case 'f':
+		ground.StepShader();
 		break;
 
 	case 'A':
@@ -250,6 +256,74 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 //	b2Body* body = world.CreateBody(&bodyDef);
 //}
 
+void DisplayFuncCrack()
+{
+	//float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	//current_time = current_time - window.total_time_paused;
+
+	//glDisable(GL_CULL_FACE);
+
+	//glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+	//glViewport(0, 0, window.size.x / 3, window.size.y / 3);
+
+	//mat4 projection = perspective(20.0f, window.aspect, 1.0f, 600.0f);
+
+	//radius = 20.0f;
+
+	//mat4 modelview;
+	//modelview = translate(modelview, vec3(0.0f, -3.0f, -5.0f));
+
+	//glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+	////Draw map elements (ground and walls)
+	////modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+	//ball.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
+	//screen.DrawScreen(projection, modelview, window.size, fbo, 6);  //Draw cracked screen
+	//
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	current_time = current_time - window.total_time_paused;
+
+	glDisable(GL_CULL_FACE);
+
+	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, window.size.x, window.size.y);
+
+	mat4 projection = perspective(35.0f, 1.0f, 1.0f, 600.0f);
+
+	radius = 20.0f;
+
+	mat4 modelview;
+	/*modelview = rotate(modelview, -90.0f, vec3(1.0f, 0.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 5.0f, 0.0f));*/
+	modelview = lookAt(vec3(0.0f, 0.0f, -5.0f), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+
+	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+	//Draw map elements (ground and walls)
+	//modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
+	//ground2.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
+	//miniWalls.Draw_walls(projection, modelview, window.size);
+	//modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
+	
+	modelview = translate(modelview, vec3(0.0f, -8.0f, 0.0f));
+	screen.DrawScreen(projection, modelview, window.size, fbo, 6, current_time);
+
+	
+	player.Draw(projection, modelview, window.size, window.stage, window.shader);
+	
+
+
+	
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
+}
+
 void DisplayFuncFloor()
 {
 	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
@@ -292,11 +366,11 @@ void DisplayFuncClock()
 	current_time = current_time - window.total_time_paused;
 
 	glDisable(GL_CULL_FACE);
-
+	clockFbo.Bind();
 	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glViewport(window.size.x - window.size.x/8, window.size.y - window.size.x/8, window.size.x/8, window.size.x/8);
-	//glViewport(0, 0, window.size.x, window.size.y);
+	//glViewport(window.size.x - window.size.x/8, window.size.y - window.size.x/8, window.size.x/8, window.size.x/8);
+	glViewport(0, 0, fbo2.size.x, fbo2.size.y);
 	mat4 projection = perspective(35.0f, 1.0f, 1.0f, 600.0f);
 
 	radius = 20.0f;
@@ -309,12 +383,40 @@ void DisplayFuncClock()
 
 	//Draw map elements (ground and walls)
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
-	clock.Draw(projection, modelview, ivec2(window.size.x/8, window.size.x/8), window.stage, window.shader, current_time);
+	clock.Draw(projection, modelview, ivec2(fbo.size.x, fbo.size.y), window.stage, window.shader, current_time);
 	//clock.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
-	//walls.Draw_walls(projection, modelview, window.size);
-	//modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	clockFbo.Unbind();
+
+}
+
+void DisplayFuncClock2()
+{
+
+	float current_time = (glutGet(GLUT_ELAPSED_TIME)) / 1000.0f;
+	current_time = current_time - window.total_time_paused;
+
+	glDisable(GL_CULL_FACE);
+
+	glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glViewport(window.size.x - window.size.x/8, window.size.y - window.size.x/8, window.size.x/8, window.size.x/8);
+
+	mat4 projection = perspective(35.0f, 1.0f, 1.0f, 600.0f);
+
+	radius = 20.0f;
 
 
+	mat4 modelview;
+	modelview = rotate(modelview, -90.0f, vec3(1.0f, 0.0f, 0.0f));
+	modelview = translate(modelview, vec3(0.0f, 350.0f, 0.0f));
+
+	glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
+
+	modelview = rotate(modelview, 180.0f, vec3(1.0f, 0.0f, 0.0f));
+	trueGround.Draw_floors(projection, modelview, window.size, clockFbo, current_time);
+	
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
@@ -427,11 +529,6 @@ void DisplayFunc2()
 
 	radius = 20.0f;
 
-	float tempX = xpos;
-	float tempZ = zpos;
-	float tempLookatX = lookatX;
-	float tempLookatZ = lookatZ;
-
 	mat4 modelview;
 	modelview = rotate(modelview, -90.0f, vec3(1.0f, 0.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, 350.0f, 0.0f));
@@ -441,7 +538,7 @@ void DisplayFunc2()
 	//Draw map elements (ground and walls)
 	//modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	ground2.Draw(projection, modelview, window.size, window.stage, window.shader, current_time);
-	walls.Draw_walls(projection, modelview, window.size);
+	miniWalls.Draw_walls(projection, modelview, window.size);
 	//modelview = translate(modelview, vec3(0.0f, 1.0f, 0.0f));
 
 
@@ -624,7 +721,7 @@ void DisplayFunc()
 							angleV = 360.0f + angleV;
 
 						angleV = 180 - angleV;
-						cout << "hit z side " << endl;
+						//cout << "hit z side " << endl;
 					}
 
 					else if (xpos < boxes.at(i).getPostion().x - window.obstacle_width/2.0f || xpos > boxes.at(i).getPostion().x + window.obstacle_width/2.0f)
@@ -632,7 +729,7 @@ void DisplayFunc()
 						lookatX = xpos - (lookatX - xpos);
 						angleV = -angleV;
 
-						cout << "hit x side " << endl;
+						//cout << "hit x side " << endl;
 					}
 
 				}
@@ -671,13 +768,13 @@ void DisplayFunc()
 
 					float angleTemp = acos((pow(distanceB, 2) - pow(distanceA, 2) - pow(distanceC, 2)) / (2 * distanceA * distanceC));
 
-					cout << "original: " << angleV << endl;
-					cout << "angleTemp: " << angleTemp << endl;
+					//cout << "original: " << angleV << endl;
+					//cout << "angleTemp: " << angleTemp << endl;
 					if (yDiffFromCenter >= 0.0f)
 						angleV = angleV + 90 - angleTemp * 5.0f;
 					else
 						angleV = angleV - 90 - angleTemp * 5.0f;
-					cout << "new angle: " << angleV << endl;
+					//cout << "new angle: " << angleV << endl;
 
 					window.hit_something = true;
 				}
@@ -707,6 +804,9 @@ void DisplayFunc()
 		glViewport(0, 0, window.size.x, window.size.y);
 
 		RenderIntoFrameBuffer2(modelview, projection);
+		glViewport(0, 0, window.size.x, window.size.y);
+
+		DisplayFuncClock();
 		glViewport(0, 0, window.size.x, window.size.y);
 
 		glPolygonMode(GL_FRONT_AND_BACK, window.wireframe ? GL_LINE : GL_FILL);
@@ -828,24 +928,37 @@ void DisplayFunc()
 				modelview = translate(modelview, -boxes.at(i).getPostion());
 			}
 
-			if (window.hit_something) // display a cracked screen if hit something
-			{
-				/*modelview = translate(modelview, vec3(xpos + 0.25f * (lookatX - xpos), -7.0f, zpos + 0.25f * (lookatZ - zpos)));
-				modelview = rotate(modelview, angleV, vec3(0.0f, 1.0f, 0.0f));
-				modelview = scale(modelview, vec3(0.5f, 1.0f, 0.5f));*/
-				//glMatrixMode(GL_PROJECTION);
-				//glLoadIdentity();
-				//gluOrtho2D(0.0,window.size.x, 0.0, window.size.y);
-				//projection = ortho(0, window.size.x, 0, window.size.y, 1, 10);
-				//glMatrixMode(GL_MODELVIEW);
-				//glLoadIdentity();
-				//modelview = mat4(1.0f);
-				//glLoadMatrixf(value_ptr(modelview));
-				
-				//screen.DrawScreen(projection, modelview, window.size, fbo, 6);  //Draw cracked screen
-				//,odelview = translate(modelview, vec3(-lookatX, 15.0f, -lookatZ));
-				//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			}
+			//if (window.hit_something) // display a cracked screen if hit something
+			//{
+			//	/*modelview = translate(modelview, vec3(xpos + 0.25f * (lookatX - xpos), -7.0f, zpos + 0.25f * (lookatZ - zpos)));
+			//	modelview = rotate(modelview, angleV, vec3(0.0f, 1.0f, 0.0f));
+			//	modelview = scale(modelview, vec3(0.5f, 1.0f, 0.5f));*/
+			//	//glMatrixMode(GL_PROJECTION);
+			//	//glLoadIdentity();
+			//	//gluOrtho2D(0.0,window.size.x, 0.0, window.size.y);
+			//	//projection = ortho(0, window.size.x, 0, window.size.y, 1, 10);
+			//	//glMatrixMode(GL_MODELVIEW);
+			//	//glLoadIdentity();
+			//	//modelview = mat4(1.0f);
+			//	//glLoadMatrixf(value_ptr(modelview));
+			//	
+			//	//screen.DrawScreen(projection, modelview, window.size, fbo, 6);  //Draw cracked screen
+			//	//,odelview = translate(modelview, vec3(-lookatX, 15.0f, -lookatZ));
+			//	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+			//	/*glMatrixMode(GL_PROJECTION);
+			//	glLoadIdentity();
+			//	glOrtho(0, 1, 0, 1, 0, 1);
+			//	glMatrixMode(GL_MODELVIEW);
+			//	glColor3f(0.0f, 0.0f, 0.0f);
+			//	glBegin(GL_QUADS);
+			//	glVertex2f(0,0);
+			//	glVertex2f(1,0);
+			//	glVertex2f(1,1);
+			//	glVertex2f(0,1);
+			//	glEnd();*/
+			//	DisplayFuncCrack();
+			//}
 
 			if (!window.gameStart) //Display start screen
 			{
@@ -886,7 +999,12 @@ void DisplayFunc()
 
 		//Display the clock
 		if (window.clock_on)
-			DisplayFuncClock();
+			DisplayFuncClock2();
+
+		if (window.hit_something) // display a cracked screen if hit something
+		{
+			DisplayFuncCrack();
+		}
 
 		window.hit_something = false; //reset to not show cracked screen
 
@@ -1017,12 +1135,31 @@ GLint main(GLint argc, GLchar * argv[])
 
 	window.plus_sign.push_back("+");
 
-	cout << "		/************************\ " << endl;
+	//Display instructions
+	cout << "       /************************\\ " << endl;
 	cout << "       |   Welcome to Moshball  |" << endl;
-	cout << "       \************************/" << endl;
+	cout << "       \\************************/" << endl;
 	cout << "                   | |           " << endl;
+	cout << "                   | |       " << endl;;
 	cout << "instruction:" << endl;
-	cout << "	Move the ball around" << endl;
+	cout << "	Move the ball around to hit all the other balls." << endl;
+	cout << "	Hit balls only stay hit for a while though and " << endl;
+	cout << "	look out for Bombs! good luck and stay safe" << endl;
+	cout << endl;
+	cout << "Buttons: " << endl;
+	cout <<	"	Mouse -- Movement" << endl;
+	cout << "	p     -- Pause" << endl;
+	cout << "	w     -- Wireframe" << endl;
+	cout << "	s     -- Change ball shader" << endl;
+	cout << "	a     -- Change ball material" << endl;
+	cout << "	f     -- Change floor shader" << endl;
+	cout << "	m     -- Minimap on/off" << endl;
+	cout << "	c     -- Clock on/off" << endl;
+	cout << "	F1    -- Change display Mode" << endl;
+	cout << "	pages -- Increase/decrease stacks and slices" << endl;
+	cout << "	l     -- Change level shortcut (for cheaters)" << endl;
+
+
 
 	assert(GLEW_OK == glewInit());	
 
@@ -1043,7 +1180,9 @@ GLint main(GLint argc, GLchar * argv[])
 		return 0;
 	if (!clock.InitializeFloor(false, true, false))
 		return 0;
-	if (!walls.InitializeWalls())
+	if (!walls.InitializeWalls(false))
+		return 0;
+	if (!miniWalls.InitializeWalls(true))
 		return 0;
 	if (!tron.InitializeCylinder())
 		return 0;
@@ -1068,6 +1207,17 @@ GLint main(GLint argc, GLchar * argv[])
 		cerr << "Frame buffer failed to initialize." << endl;
 		return 0;
 	}
+	if (!clockFbo.Initialize(glm::ivec2(512, 512), 1, true))
+	{
+		cerr << "Frame buffer failed to initialize." << endl;
+		return 0;
+	}
+	
+
+	int randomNumber = 0;
+
+	//if (argc > 1)
+	//	randomNumber = (int)argv;
 
 	setLevel();
 

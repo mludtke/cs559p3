@@ -146,12 +146,6 @@
     <None Include="clock.vert">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="unused.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="unused.vert">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="Gouraud_shader.frag">
       <Filter>Shader Files</Filter>
     </None>
@@ -216,6 +210,15 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="space.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="solid_shader_white.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="solid_shader_white.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="..\..\..\..\..\Downloads\GLSL\GLSL\examples\checkedlamb.frag">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

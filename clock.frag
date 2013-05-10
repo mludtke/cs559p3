@@ -32,8 +32,11 @@ void main(void)
 	float mins = mod( floor(time/60.0),   60.0 )+5.;
 	float hors = mod( floor(time/3600.0), 24.0 );
 	
-	vec2 uv = -1.0 + 2.0*gl_FragCoord.xy / resolution.xy ;
-	uv.x *= resolution.x/resolution.y;
+
+	vec2 uv = -1.0 + 2.0*gl_FragCoord.xy / (resolution.xy) ;
+	uv.y *= resolution.x/resolution.x;
+
+
 	
 	float r = length( uv ); //radius
 	float a = atan( uv.y, uv.x )+3.1415926;

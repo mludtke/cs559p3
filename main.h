@@ -69,7 +69,7 @@ Sphere ball;	//normal ball
 Sphere ball2;	//hit ball
 Sphere player;  //The players ball
 Sphere bomb;
-Map ground, walls, cursor, ground2, clock, trueGround;	//map objects
+Map ground, walls, miniWalls, cursor, ground2, clock, trueGround;	//map objects
 JumboTron tron, screen;	//JumboTrons
 vector<Sphere> balls; //balls
 vector<Obstacle> boxes;
@@ -80,7 +80,8 @@ Obstacle box;
 Scoreboard score;
 Scoreboard scoreScreen;
 FrameBufferObject fbo; // jumbotron framebuffer
-FrameBufferObject fbo2;
+FrameBufferObject fbo2; //floor framebuffer
+FrameBufferObject clockFbo;
 
 string displayNumRemaining;
 string displayNumBalls;

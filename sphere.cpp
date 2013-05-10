@@ -21,15 +21,15 @@ Sphere::Sphere() : Object()
 		//cout << to_string(lightPos[i]) << endl;
 	}
 	this->x = this->y = this->z = 0.0f;
-	cout << "shader_index: " << shader_index << endl;
-	cout << "shaders.size(): " << shaders.size() << endl;
+	/*cout << "shader_index: " << shader_index << endl;
+	cout << "shaders.size(): " << shaders.size() << endl;*/
 }
 
 void Sphere::StepShader()
 {
 	assert (this->shaders.size() != 0);
-	cout << "shader_index: " << shader_index << endl;
-	cout << "shaders.size(): " << shaders.size() << endl;
+	/*cout << "shader_index: " << shader_index << endl;
+	cout << "shaders.size(): " << shaders.size() << endl;*/
 	this->shader_index = ++this->shader_index % this->shaders.size();	
 }
 
@@ -275,6 +275,7 @@ bool Sphere::Initialize(int hit, GLint slices, GLint stacks)
 
 	assert(this->texture.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"));
 	assert(this->phong.Initialize("phong_shader.vert", "phong_shader.frag"));
+	
 	assert(this->phong2.Initialize("phong2.vert", "phong2.frag"));
 	//assert(this->twoside.Initialize("twoside.vert", "twoside.frag"));
 	assert(this->flat.Initialize("flat.vert", "flat.frag"));

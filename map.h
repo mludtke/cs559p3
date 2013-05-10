@@ -14,7 +14,7 @@ public:
 	
 	bool InitializeFloor(bool minimap, bool clock, bool floor);
 
-	bool InitializeWalls();
+	bool InitializeWalls(bool minimap);
 
 	bool InitializeCursor();
 
@@ -26,13 +26,16 @@ public:
 	void DrawCursor(const glm::mat4 & projection, glm::mat4 modelview, const glm::ivec2 & size);
 
 	void TakeDown();
-	Shader shader;
+	void StepShader();
+	Shader shader, space, color_changer, rainbow;
 	ADSShader adsShader;
 	Shader solid_color;
 
 private:
 	void BuildNormalVisualizationGeometry();
 	glm::vec4 colors[2];
+	GLuint shader_index;
+	std::vector<Shader *> shaders;
 	std::vector<VertexAttributesPCNT> vertices;
 	typedef Object super;
 	float time;

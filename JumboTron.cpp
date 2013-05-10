@@ -414,7 +414,7 @@ void JumboTron::DrawScreen(const mat4 & projection, mat4 modelview, const ivec2 
 
   glEnable(GL_DEPTH_TEST);
 
-  modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
+ // modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
   mat4 mvp = projection * modelview;
   mat3 nm = inverse(transpose(mat3(modelview)));
 

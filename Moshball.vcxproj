@@ -111,6 +111,7 @@
     <ClInclude Include="vertexattributes.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\..\Downloads\GLSL\GLSL\examples\checkedlamb.frag" />
     <None Include=".gitignore" />
     <None Include="basic_texture_shader.frag" />
     <None Include="basic_texture_shader.vert" />
@@ -138,8 +139,8 @@
     <None Include="time_perforated.vert" />
     <None Include="twoside.frag" />
     <None Include="twoside.vert" />
-    <None Include="unused.frag" />
-    <None Include="unused.vert" />
+    <None Include="solid_shader_white.frag" />
+    <None Include="solid_shader_white.vert" />
     <None Include="Gouraud_shader.frag" />
     <None Include="Gouraud_shader.vert" />
     <None Include="phong_shader.frag" />
