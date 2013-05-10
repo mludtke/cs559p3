@@ -1,13 +1,3 @@
-/*	Perry Kivolowitz - University of Wisconsin - Madison 
-Computer Sciences Department
-
-A sample hello world like program demonstrating modern
-OpenGL techniques. 
-
-Created:	2/25/13
-Updates:
-*/
-
 #pragma once
 #include <iostream>
 #include <sstream>
@@ -41,7 +31,7 @@ public:
 	void printShader();
 
 protected:
-	bool GLReturnedError(char * s);
+	bool GLReturnedError(char * caller);
 
 };
 
@@ -63,8 +53,7 @@ class ADSShader : public Shader
 {
 public:
 	ADSShader();
-	virtual bool Initialize(char * vertex_shader_file, char * fragment_shader_file);
-	//virtual void CustomSetup();
+	virtual bool Initialize(char * vertex_shader_file, char * fragment_shader_file);	
 	void SetLight(glm::vec4 position, glm::vec3 la, glm::vec3 ld, glm::vec3 ls);
 	void SetMaterial(glm::vec3 ka, glm::vec3 kd, glm::vec3 ks, float shininess);
 

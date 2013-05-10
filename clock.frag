@@ -5,7 +5,7 @@ precision mediump float;
 uniform float time;
 uniform ivec2 size;
 
-vec2 resolution = vec2(512, 512); 
+vec2 resolution = vec2(size.y, size.y); 
 
 float R = resolution.y;		// Screen 'DPI'
 
@@ -32,10 +32,10 @@ void main(void)
 	float mins = mod( floor(time/60.0),   60.0 )+5.;
 	float hors = mod( floor(time/3600.0), 24.0 );
 	
-	vec2 uv = -1.0 + 2.0*gl_FragCoord.xy / resolution.xy;
+	vec2 uv = -1.0 + 2.0*gl_FragCoord.xy / resolution.xy ;
 	uv.x *= resolution.x/resolution.y;
 	
-	float r = length( uv );
+	float r = length( uv ); //radius
 	float a = atan( uv.y, uv.x )+3.1415926;
     
 	// background color
@@ -48,12 +48,12 @@ void main(void)
 
 	// hours & minute marks	
 	float u, h, m;
-	u = r * 6.2831 / 12.;
+	u = r * 6.2831 / 12.; //(radius * 2pi / 12(number of hours)
 	h = fract(a*r/u +.5)-.5;
 	h = .004-.5*abs(h*u);
 	h *= (1.-step(r, .84))*step(r, .95);
 	
-	u = r * 6.2831 / 60.;
+	u = r * 6.2831 / 60.; //(radius * 2pi / 60(number of minutes
 	m = fract(a*r/u +.5)-.5;
 	m = .0025-.5*abs(m*u);
 	m *= (1.-step(r, .89))*step(r, .95);

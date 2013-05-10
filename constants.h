@@ -47,7 +47,7 @@ struct Materials{
 /* list of materials */
 const Materials materials[] = {
   { 
-	  glm::vec3(0.329412, 0.223529, 0.027451),
+	glm::vec3(0.329412, 0.223529, 0.027451),
     glm::vec3(0.780392, 0.568627, 0.113725),
     glm::vec3(0.992157, 0.941176, 0.807843),
     27.8974f

@@ -9,12 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{2f4d04a9-46ed-44c1-8702-23c4fe35d488}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Texture files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{2f4d04a9-46ed-44c1-8702-23c4fe35d488}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -99,64 +99,124 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="basic_texture_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="blue_shader.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="blue_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="phong_shader.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="phong_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="solid_shader.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="solid_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="text_shader.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="text_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="rainbow.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="rainbow.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="water_shader.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="water_shader.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="gouraud_shader.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="gouraud_shader.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="basic_texture_shader.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="light.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="light.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="clock.frag">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
     </None>
     <None Include="clock.vert">
-      <Filter>Shaders</Filter>
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="unused.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="unused.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Gouraud_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="Gouraud_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="flat_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="flat_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="color_changer_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="color_changer_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="flat.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="flat.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="normal.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="normal.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="perforated.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="perforated.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="phong.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="phong.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="phong2.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="phong2.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="twoside.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="twoside.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="time_perforated.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="time_perforated.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="space.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="space.vert">
+      <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +284,36 @@
       <Filter>Texture files</Filter>
     </Image>
     <Image Include="Broken-glass.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="Ball 15.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="arabian_nights.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="water.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="mountains.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="violentdays_large.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="earth.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="red_earth.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="caution.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="Ball10.jpg">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="grimnight.jpg">
       <Filter>Texture files</Filter>
     </Image>
   </ItemGroup>

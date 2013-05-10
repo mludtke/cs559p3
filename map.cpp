@@ -29,7 +29,7 @@ void Map::BuildNormalVisualizationGeometry()
 	}
 }
 
-bool Map::InitializeFloor(bool minimap)
+bool Map::InitializeFloor(bool minimap, bool clock, bool floor)
 {
 	if (this->GLReturnedError("Floor::Initialize - on entry"))
 		return false;
@@ -55,10 +55,16 @@ bool Map::InitializeFloor(bool minimap)
 	y = 0.0f;
 	z = 105.0f;
 
-	int steps = 15;
+	int steps = 1;
 	float increment = height / (float)steps;
 
 	VertexAttributesPCNT bottom_left_vertex, top_left_vertex, bottom_right_vertex, top_right_vertex;
+
+	bottom_left_vertex.texture_coordinate = vec2(0.0f, 0.0f);
+	bottom_right_vertex.texture_coordinate = vec2(1.0f, 0.0f);
+	top_left_vertex.texture_coordinate = vec2(0.0f, 1.0f);
+	top_right_vertex.texture_coordinate = vec2(1.0f, 1.0f);
+
 
 	//create the floor coordinates
 	for (int i = 0; i < steps; i++)
@@ -139,23 +145,38 @@ bool Map::InitializeFloor(bool minimap)
 	}
 
 	
-	if (!minimap) //special effects should not be done on minimap
-	{
-		/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
-			return false;*/
-		if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
-			return false;
-		/*if(!this->shader.Initialize("water_shader.vert", "water_shader.frag"))
-			return false;*/
-		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
-			return false;*/
-	}
-	else //need basic shading for the minimap
+	if (minimap) //special effects should not be done on minimap
 	{
 		if (!this->shader.Initialize("solid_shader.vert", "solid_shader.frag"))
 			return false;
 		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
 			return false;*/
+	}
+	else if (clock)
+	{
+		if(!this->shader.Initialize("clock.vert", "clock.frag"))
+			return false;
+	}
+	else if (floor)
+	{
+		if(!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
+			return false;
+
+	}
+	else //floor shader
+	{
+		/*if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("rainbow.vert", "rainbow.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("water_shader.vert", "water_shader.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("clock.vert", "clock.frag"))
+			return false;*/
+		/*if(!this->shader.Initialize("color_changer_shader.vert", "color_changer_shader.frag"))
+			return false;*/
+		if(!this->shader.Initialize("space.vert", "space.frag"))
+			return false;
 	}
 
 	if (this->GLReturnedError("Floor::Initialize - on exit"))
@@ -612,6 +633,8 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLin
 	shader.Use();
 	shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
 
+	//cout << "window size: " << size << endl;
+
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
 	glBindVertexArray(0);
@@ -631,6 +654,47 @@ void Map::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, GLin
 		return;
 }
 
+void Map::Draw_floors(const mat4 & projection, mat4 modelview, const ivec2 & size, FrameBufferObject fbo, float time)
+{
+	if (this->GLReturnedError("floor::Draw - on entry"))
+    return;
+
+  glEnable(GL_DEPTH_TEST);
+
+  //modelview = rotate(modelview, time * 120.0f, vec3(0.0f, 1.0f, 0.0f));
+  mat4 mvp = projection * modelview;
+  mat3 nm = inverse(transpose(mat3(modelview)));
+
+  glBindTexture(GL_TEXTURE_2D, fbo.texture_handles[0]);
+
+  glEnable(GL_TEXTURE_2D);
+
+	glTexEnvf(GL_TEXTURE_ENV , GL_TEXTURE_ENV_MODE , GL_REPLACE);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_S , GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_WRAP_T , GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MAG_FILTER , GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D , GL_TEXTURE_MIN_FILTER , GL_LINEAR);
+
+  shader.Use();
+  shader.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+  glBindVertexArray(this->vertex_array_handle);
+  glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);
+  glBindVertexArray(0);
+  glUseProgram(0);
+
+  if (this->draw_normals)
+  {    
+    this->solid_color.Use();
+    this->solid_color.CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));
+    glBindVertexArray(this->normal_array_handle);
+    glDrawElements(GL_LINES , this->normal_indices.size(), GL_UNSIGNED_INT , &this->normal_indices[0]);
+    glBindVertexArray(0);
+    glUseProgram(0);
+  }
+
+  if (this->GLReturnedError("floor::Draw - on exit"))
+    return;
+}
 
 void Map::Draw_walls(const mat4 & projection, mat4 modelview, const ivec2 & size, const float time)
 {

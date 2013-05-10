@@ -1,12 +1,3 @@
-/*	Perry Kivolowitz - University of Wisconsin - Madison 
-	Computer Sciences Department
-
-
-
-	Created:	2/25/13
-	Updates:	3/19/13 - added an ADS shader to correctly portray Gouraud and flat shading 
-*/
-
 #include "shader.h"
 #include <assert.h>
 

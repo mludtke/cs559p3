@@ -7,13 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
-//#include "background.h"
 #include "sphere.h"
 #include "map.h"
 #include "JumboTron.h"
 #include "Skybox.h"
-//#include "Box2D\Box2D.h"
 #include "Obstacle.h"
 #include "Scoreboard.h"
 
@@ -49,6 +46,7 @@ public:
 	GLboolean betweenLevels; //if between levels
 	GLboolean minimap; //if showing minimap
 	GLboolean hit_something; //if had hit something
+	GLboolean clock_on; //if clock is on
 	GLint slices;	//number of slices
 	GLint stacks;	//number of stacks
 	GLint shader;	//current shader
@@ -71,7 +69,7 @@ Sphere ball;	//normal ball
 Sphere ball2;	//hit ball
 Sphere player;  //The players ball
 Sphere bomb;
-Map ground, walls, cursor, ground2;	//map objects
+Map ground, walls, cursor, ground2, clock, trueGround;	//map objects
 JumboTron tron, screen;	//JumboTrons
 vector<Sphere> balls; //balls
 vector<Obstacle> boxes;
@@ -91,8 +89,8 @@ string displayLevel;
 static GLfloat xrot = 0.0f, yrot = 0.0f; //used for mouse movement
 static GLfloat xdiff = 0.0f, ydiff = 0.0f;	//used for mouse movement (old)
 GLfloat radius, xpos, ypos, zpos;	//used for camera movement
-GLfloat angleH, angleV;	//ditto
-GLfloat cameraX, cameraZ;
+GLfloat angleH, angleV, angleh;	//ditto
+GLfloat cameraX, cameraY, cameraZ;
 GLfloat lookatX = 0.0f, lookatY = 0.0f, lookatZ = 0.0f; //first person camera movement
 
 float PI = 3.1415926f;
@@ -110,10 +108,11 @@ int debug_mode = 1;	//keeps track of what debug mode it is in
 void DisplayFunc();
 void DisplayFunc2();
 void DisplayFunc3();
+void DisplayFuncFloor();
 
 GLvoid setLevel()
 {
-	if (window.stage == 7)
+	if (window.stage == 8)
 	{
 		window.gameWon = true;
 		debug_mode = 2;
@@ -126,12 +125,12 @@ GLvoid setLevel()
 	zpos = 20.0f;
 
 	angleV = 0.0f;
-
-	ball.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 0, 0.00f);
-
-	ball2.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 1, 0.00f);
-	
-	player.Initialize(window.slices, window.stacks, window.ball_radius, window.shader, 2, 0.00f);	//hit = 2 to show not a playing object
+	ball.TakeDown();
+	ball.Initialize(0, window.slices, window.stacks);
+	ball2.TakeDown();
+	ball2.Initialize(1, window.slices, window.stacks);
+	player.TakeDown();
+	player.Initialize(2, window.slices, window.stacks);	//hit = 2 to show not a playing object
 
 	srand (0);		//seed generator
 	for (int i = 0; i < window.num_balls; i++)
@@ -150,6 +149,7 @@ GLvoid setLevel()
 		balls.at(i).reset();
 	}
 
+	boxes.clear();
 	for (int i = 0; i < window.num_boxes; i++)
 	{
 		boxes.push_back(crate);
@@ -162,6 +162,17 @@ GLvoid setLevel()
 		boxes.at(i).setForce(0.0f);
 		boxes.at(i).setDirection(vec3(0.0f, 0.0f, 0.0f));
 	}
+
+	ostringstream convert4;
+	convert4.clear();
+	convert4 << window.stage;
+	displayLevel = convert4.str();
+	window.instructions.pop_back();
+	window.instructions.pop_back();
+	window.instructions.pop_back();
+	window.instructions.push_back("Level: " + displayLevel);
+	window.instructions.push_back("Targets remaining: " + displayNumRemaining + " / " + displayNumBalls);
+	window.instructions.push_back("Time played: " );
 }
 
 //display center cursor
@@ -242,6 +253,6 @@ void RenderIntoFrameBuffer(mat4 m, mat4 p)
 void RenderIntoFrameBuffer2(mat4 m, mat4 p)
 {
 	fbo2.Bind();
-	DisplayFunc3();
+	DisplayFuncFloor();
 	fbo2.Unbind();
 }
