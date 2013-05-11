@@ -35,9 +35,9 @@ Sphere::Sphere() : Object()
 void Sphere::StepShader()
 {
 	assert (this->shaders.size() != 0);
-	/*cout << "shader_index: " << shader_index << endl;
-	cout << "shaders.size(): " << shaders.size() << endl;*/
+	
 	this->shader_index = ++this->shader_index % this->shaders.size();	
+	cout << "shader: " << shader_index << endl;
 }
 
 void Sphere::StepMaterial()
@@ -279,16 +279,17 @@ bool Sphere::Initialize(int hit, GLfloat radius, GLint slices, GLint stacks )
 		glBindVertexArray(0);
 	}  
 
-	assert(this->texture.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"));
-	assert(this->phong.Initialize("phong_shader.vert", "phong_shader.frag"));
+	assert(this->texture.Initialize("./shaders/basic_texture_shader.vert", "./shaders/basic_texture_shader.frag"));
+	assert(this->phong.Initialize("./shaders/phong_shader.vert", "./shaders/phong_shader.frag"));
 	
-	assert(this->phong2.Initialize("phong2.vert", "phong2.frag"));
+	assert(this->phong2.Initialize("./shaders/phong2.vert", "./shaders/phong2.frag"));
 	//assert(this->twoside.Initialize("twoside.vert", "twoside.frag"));
-	assert(this->flat.Initialize("flat.vert", "flat.frag"));
-	assert(this->perforated.Initialize("perforated.vert", "perforated.frag"));
-	assert(this->time_perforated.Initialize("time_perforated.vert", "time_perforated.frag"));  
+	assert(this->flat.Initialize("./shaders/flat.vert", "./shaders/flat.frag"));
+	assert(this->perforated.Initialize("./shaders/perforated.vert", "./shaders/perforated.frag"));
+	assert(this->time_perforated.Initialize("./shaders/time_perforated.vert", "./shaders/time_perforated.frag"));  
 	//assert(this->normal.Initialize("normal.vert", "normal.frag"));
-	assert(this->dark.Initialize("solid_shader.vert", "solid_shader.frag"));  
+	assert(this->dark.Initialize("./shaders/solid_shader.vert", "./shaders/solid_shader.frag"));  
+	assert(this->toon.Initialize("./shaders/toon.vert", "./shaders/toon.frag"));
 
 	this->shaders.push_back(&phong);
 	this->shaders.push_back(&texture);
@@ -298,6 +299,7 @@ bool Sphere::Initialize(int hit, GLfloat radius, GLint slices, GLint stacks )
 	//this->shaders.push_back(&twoside);
 	this->shaders.push_back(&flat);
 	this->shaders.push_back(&dark);
+	this->shaders.push_back(&toon);
 	
 
 	if (this->GLReturnedError("Sphere::Initialize - on exit"))
@@ -318,6 +320,7 @@ void Sphere::TakeDown()
 	this->perforated.TakeDown();
 	this->texture.TakeDown();
 	this->normal.TakeDown();
+	this->toon.TakeDown();
 	super::TakeDown();
 }
 
@@ -334,8 +337,6 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 
 	glEnable(GL_DEPTH_TEST);
 
-	//modelview = rotate(modelview, time * 60.0f, vec3(0.0f,1.0f,0.0f));
-	//modelview = rotate(modelview, time * 30.0f, vec3(1.0f,0.0f,0.0f));
 	mat4 mvp = projection * modelview;
 	mat3 nm = inverse(transpose(mat3(modelview)));
 
@@ -359,7 +360,7 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 	this->shaders[this->shader_index]->Use();
 	this->shaders[this->shader_index]->CommonSetup(time, value_ptr(size), value_ptr(projection), value_ptr(modelview), value_ptr(mvp), value_ptr(nm));  
 
-	if (this->shader_index > 1 && this->shader_index < (shaders.size() - 1))
+	if (this->shader_index > 1 && this->shader_index < (shaders.size() - 2))
 	{
 		((ADSShader *)this->shaders[this->shader_index])->SetLight(vec4(x,y,z,1.0f), vec3(0.2f), vec3(0.7f), vec3(0.7f));
 		((ADSShader *)this->shaders[this->shader_index])->SetMaterial(materials[this->material_index].ambient, materials[this->material_index].diffuse, 
@@ -377,6 +378,22 @@ void Sphere::Draw(const mat4 & projection, mat4 modelview, const ivec2 & size, G
 				materials[MAT_BLACK_RUBBER].specular, materials[MAT_BLACK_RUBBER].shiny);	
 		}
 	} 
+
+	if (this->shader_index == shaders.size() - 1)
+	{
+		((ToonShader *)this->shaders[this->shader_index])->SetLight(vec4(x,y,z,1.0f), vec3(0.2f));
+		((ToonShader *)this->shaders[this->shader_index])->SetMaterial(materials[this->material_index].ambient, materials[this->material_index].diffuse);	
+
+		if (is_hit == 1) //hit is red color (ruby)
+		{
+			((ToonShader *)this->shaders[this->shader_index])->SetMaterial(materials[MAT_RUBY].ambient, materials[MAT_RUBY].diffuse);	
+		}
+
+		if (is_hit == 3) // Bomb is black color
+		{
+			((ToonShader *)this->shaders[this->shader_index])->SetMaterial(materials[MAT_BLACK_RUBBER].ambient, materials[MAT_BLACK_RUBBER].diffuse);	
+		}
+	}
 
 	glBindVertexArray(this->vertex_array_handle);
 	glDrawElements(GL_TRIANGLES , this->vertex_indices.size(), GL_UNSIGNED_INT , &this->vertex_indices[0]);

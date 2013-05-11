@@ -98,231 +98,234 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
-    <None Include="basic_texture_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="blue_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="blue_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="solid_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="solid_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="text_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="text_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="rainbow.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="rainbow.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="water_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="water_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="basic_texture_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="clock.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="clock.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Gouraud_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="Gouraud_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="flat_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="flat_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="color_changer_shader.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="color_changer_shader.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="flat.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="flat.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="normal.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="normal.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="perforated.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="perforated.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong2.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="phong2.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="twoside.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="twoside.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="time_perforated.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="time_perforated.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="space.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="space.vert">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="solid_shader_white.frag">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="solid_shader_white.vert">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="..\..\..\..\..\Downloads\GLSL\GLSL\examples\checkedlamb.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\basic_texture_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\basic_texture_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\blue_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\blue_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\clock.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\clock.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\color_changer_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\color_changer_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\flat.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\flat.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\flat_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\flat_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\Gouraud_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\Gouraud_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\normal.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\normal.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\perforated.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\perforated.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong2.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong2.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\phong_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\rainbow.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\rainbow.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\solid_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\solid_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\solid_shader_white.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\solid_shader_white.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\space.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\space.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\text_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\text_shader.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\time_perforated.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\time_perforated.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\toon.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\toon.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\twoside.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\twoside.vert">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\water_shader.frag">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shaders\water_shader.vert">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="stone.jpg">
+    <Image Include="Textures\advertisments.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="blue-sky-texture.jpg">
+    <Image Include="Textures\arabian_nights.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="cubemap.jpg">
+    <Image Include="Textures\Ball 15.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="grass.jpg">
+    <Image Include="Textures\Ball10.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="simpson_skybox.jpg">
+    <Image Include="Textures\Ball8.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="lava.jpg">
+    <Image Include="Textures\blue-sky-texture.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="cloudy.jpg">
+    <Image Include="Textures\Broken-glass.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="garden_sky.jpg">
+    <Image Include="Textures\caution.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="spheremapgalaxyasteroid.jpg">
+    <Image Include="Textures\cloudy.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="metalplate.jpg">
+    <Image Include="Textures\crate.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="fulllg.jpg">
+    <Image Include="Textures\cubemap.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="sunset.jpg">
+    <Image Include="Textures\earth.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="winner.jpg">
+    <Image Include="Textures\field.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="introScreen.jpg">
+    <Image Include="Textures\fulllg.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="nextLevel.jpg">
+    <Image Include="Textures\garden_sky.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="you_lost.jpg">
+    <Image Include="Textures\grass.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="interstellar_large.jpg">
+    <Image Include="Textures\grimnight.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="you_won.jpg">
+    <Image Include="Textures\interstellar_large.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="red_mountain.jpg">
+    <Image Include="Textures\introScreen.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="advertisments.jpg">
+    <Image Include="Textures\metalplate.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="field.jpg">
+    <Image Include="Textures\mountains.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="Broken-glass.jpg">
+    <Image Include="Textures\nextLevel.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="Ball 15.jpg">
+    <Image Include="Textures\red_earth.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="arabian_nights.jpg">
+    <Image Include="Textures\red_mountain.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="water.jpg">
+    <Image Include="Textures\simpson_skybox.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="mountains.jpg">
+    <Image Include="Textures\spheremapgalaxyasteroid.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="violentdays_large.jpg">
+    <Image Include="Textures\stone.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="earth.jpg">
+    <Image Include="Textures\sunset.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="red_earth.jpg">
+    <Image Include="Textures\violentdays_large.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="caution.jpg">
+    <Image Include="Textures\water.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="Ball10.jpg">
+    <Image Include="Textures\winner.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="grimnight.jpg">
+    <Image Include="Textures\you_lost.jpg">
       <Filter>Texture files</Filter>
     </Image>
-    <Image Include="crosshair.png">
-      <Filter>Texture files</Filter>
-    </Image>
-    <Image Include="crosshaircyan.png">
+    <Image Include="Textures\you_won.jpg">
       <Filter>Texture files</Filter>
     </Image>
   </ItemGroup>

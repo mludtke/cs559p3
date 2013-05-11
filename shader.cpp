@@ -343,3 +343,44 @@ void TexturedShader::CustomSetup()
 //	return 1;	
 //
 //}
+
+ToonShader::ToonShader() : super()
+{  
+  this->position_handle = BAD_GL_VALUE;  
+  this->intensity_handle = BAD_GL_VALUE;
+  this->ka_handle = BAD_GL_VALUE;
+  this->kd_handle = BAD_GL_VALUE;  
+}
+
+bool ToonShader::Initialize(char * vertex_shader_file, char * fragment_shader_file)
+{
+  if (!super::Initialize(vertex_shader_file, fragment_shader_file))
+    return false;
+
+  this->Use();	
+
+  this->position_handle = glGetUniformLocation(this->program_id, (const char *) "light.position");    
+  this->intensity_handle = glGetUniformLocation(this->program_id, (const char *) "light.intensity");
+  this->ka_handle = glGetUniformLocation(this->program_id, (const GLchar *) "material.ka");
+  this->kd_handle = glGetUniformLocation(this->program_id, (const GLchar *) "material.kd");
+  
+  glUseProgram(0);
+
+  assert(this->position_handle != BAD_GL_VALUE);    
+  assert(this->intensity_handle != BAD_GL_VALUE);
+  assert(this->ka_handle != BAD_GL_VALUE);
+  assert(this->kd_handle != BAD_GL_VALUE);
+  return true;
+}
+
+void ToonShader::SetLight(vec4 position, vec3 intensity)
+{
+  glUniform4fv(this->position_handle, 1, (const GLfloat *) &position);    
+  glUniform3fv(this->intensity_handle, 1, (const GLfloat *) &intensity);        
+}
+
+void ToonShader::SetMaterial(vec3 ka, vec3 kd)
+{
+  glUniform3fv(this->ka_handle, 1, (const GLfloat *) &ka);
+  glUniform3fv(this->kd_handle, 1, (const GLfloat *) &kd);  
+}

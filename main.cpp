@@ -29,7 +29,7 @@ void DisplayTime(mat4 modelview, mat4 projection, float time, vec3 position)
 	glLoadMatrixf(value_ptr(projection));
 	glViewport(0, 0, window.size.x, window.size.y);
 	glMatrixMode(GL_MODELVIEW);
-	modelview = translate(modelview, vec3(-window.ball_radius / 2.0f, 0.0f, -window.ball_radius / 2.0f));
+	//modelview = translate(modelview, vec3(-window.ball_radius / 2.0f, 0.0f, -window.ball_radius / 2.0f));
 	glLoadMatrixf(value_ptr(modelview));
 	glTranslatef(0.0f/*-0.2f + -0.175f * (3-1)*/, window.ball_radius * 1.5f, 0.0f);
 	glRotatef(angleV, 0.0f, 1.0f, 0.0f);
@@ -151,6 +151,22 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 	case 'B':
 	case 'b':
 		window.ball_radius += 0.1f;
+		window.ball_radius = clamp(window.ball_radius, 0.75f, 2.0f);
+
+		ball.TakeDown();
+		ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
+		ball2.TakeDown();
+		ball2.Initialize(1, window.ball_radius, window.slices, window.stacks);
+		player.TakeDown();
+		player.Initialize(2, window.ball_radius, window.slices, window.stacks);
+		bomb.TakeDown();
+		bomb.Initialize(3, window.ball_radius, window.slices, window.stacks);
+		break;
+
+	case 'V':
+	case 'v':
+		window.ball_radius -= 0.1f;
+		window.ball_radius = clamp(window.ball_radius, 0.75f, 2.0f);
 
 		ball.TakeDown();
 		ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
@@ -1156,6 +1172,7 @@ GLint main(GLint argc, GLchar * argv[])
 	cout << "	s     -- Change ball shader" << endl;
 	cout << "	a     -- Change ball material" << endl;
 	cout << "	f     -- Change floor shader" << endl;
+	cout << "	b/v   -- Increase/Decrease ball size" << endl;
 	cout << "	m     -- Minimap on/off" << endl;
 	cout << "	c     -- Clock on/off" << endl;
 	cout << "	F1    -- Change display Mode" << endl;
@@ -1225,41 +1242,41 @@ GLint main(GLint argc, GLchar * argv[])
 	setLevel();
 
 	//skybox textures
-	assert(TextureManager::Inst()->LoadTexture((const char *) "mountains.jpg", 1));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "sunset.jpg", 2));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "arabian_nights.jpg", 3));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "cloudy.jpg", 4));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/mountains.jpg", 1));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/sunset.jpg", 2));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/arabian_nights.jpg", 3));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/cloudy.jpg", 4));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "water.jpg", 5));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "lava.jpg", 6));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "violentdays_large.jpg", 5));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "interstellar_large.jpg", 6));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "grimnight.jpg", 7));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/violentdays_large.jpg", 5));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/interstellar_large.jpg", 6));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/grimnight.jpg", 7));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "simpson_skybox.jpg", 6));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "cubemap.jpg", 6));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "red_mountain.jpg", 7));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "spheremapgalaxyasteroid.jpg", 7));
 
 	//object textures
-	assert(TextureManager::Inst()->LoadTexture((const char *) "crate.jpg", 0));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/crate.jpg", 0));
 
 	//map textures
-	assert(TextureManager::Inst()->LoadTexture((const char *) "advertisments.jpg", 8));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/advertisments.jpg", 8));
 
 	//display screens
-	assert(TextureManager::Inst()->LoadTexture((const char *) "introScreen.jpg", 9));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "nextLevel.jpg", 10));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "you_lost.jpg", 11));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "you_won.jpg", 12));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "field.jpg", 13));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/introScreen.jpg", 9));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/nextLevel.jpg", 10));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/you_lost.jpg", 11));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/you_won.jpg", 12));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/field.jpg", 13));
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "crosshaircyan.png", 13));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "broken-glass.jpg", 14));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/broken-glass.jpg", 14));
 
 	//ball textures
 	//assert(TextureManager::Inst()->LoadTexture((const char *) "ball 15.jpg", 15));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "earth.jpg", 15));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "red_earth.jpg", 16));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "caution.jpg", 17));
-	assert(TextureManager::Inst()->LoadTexture((const char *) "ball10.jpg", 18));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/earth.jpg", 15));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/red_earth.jpg", 16));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/caution.jpg", 17));
+	assert(TextureManager::Inst()->LoadTexture((const char *) "./Textures/ball10.jpg", 18));
 
 	glutMainLoop();
 	system("pause");

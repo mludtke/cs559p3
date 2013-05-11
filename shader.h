@@ -96,3 +96,21 @@ protected:
 	GLint uniform_tex;
 	GLint uniform_color;
 };
+
+class ToonShader : public Shader
+{
+  public:  
+  ToonShader();
+  virtual bool Initialize(char * vertex_shader_file, char * fragment_shader_file);	
+  void SetLight(glm::vec4 position, glm::vec3 intensity);
+  void SetMaterial(glm::vec3 ka, glm::vec3 kd);
+
+protected:  
+  GLuint position_handle; 
+  GLuint intensity_handle;  
+  GLuint ka_handle;
+  GLuint kd_handle;  
+
+private:
+  typedef Shader super;
+};

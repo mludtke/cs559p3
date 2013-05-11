@@ -42,6 +42,7 @@ public:
 	Shader shader, phong, normal, dark, gooch;		
 	ADSShader phong2, twoside, flat, perforated, time_perforated;
 	TexturedShader texture;	
+	ToonShader toon;
 
 private:
 	void BuildNormalVisualizationGeometry();	

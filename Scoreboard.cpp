@@ -172,30 +172,10 @@ bool Scoreboard::Initialize()
 	}
 
 	
-	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+	if (!this->shader.Initialize("./shaders/phong_shader.vert", "./shaders/phong_shader.frag"))
 			return false;
 	
-	/*if(shader == 1)
-	{
-		if (!this->shader.Initialize("gouraud_shader.vert", "gouraud_shader.frag"))
-			return false;
-	}
-	if(shader == 2)
-	{
-		if(!this->adsShader.Initialize("light.vert", "light.frag"))
-			return false;
-		//if (!this->shader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			//return false;
-	}
-	if(shader == 3)
-	{
-		if (!this->adsShader.Initialize("flat_shader.vert", "flat_shader.frag"))
-			return false;
-	}
 
-	if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
-			return false;
-*/
 	if (this->GLReturnedError("Scoreboard::Initialize - on exit"))
 		return false;
 
@@ -274,7 +254,7 @@ bool Scoreboard::InitializeScreen()
 	}
 
 	
-	if (!this->shader.Initialize("phong_shader.vert", "phong_shader.frag"))
+	if (!this->shader.Initialize("./shaders/phong_shader.vert", "./shaders/phong_shader.frag"))
 			return false;
 	
 

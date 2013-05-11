@@ -298,10 +298,10 @@ bool Obstacle::Initialize(float height, float width, int shader)
     glBindVertexArray(0);
   } 
 
-  if (!this->shader.Initialize("basic_texture_shader.vert", "basic_texture_shader.frag"))
+  if (!this->shader.Initialize("./shaders/basic_texture_shader.vert", "./shaders/basic_texture_shader.frag"))
     return false;
 
-  if (!this->solid_color.Initialize("solid_shader.vert", "solid_shader.frag"))
+  if (!this->solid_color.Initialize("./shaders/solid_shader.vert", "./shaders/solid_shader.frag"))
     return false;
 
 	if (this->GLReturnedError("Obstacle::Initialize - on exit"))
