@@ -127,11 +127,11 @@ GLvoid setLevel()
 
 	angleV = 0.0f;
 	ball.TakeDown();
-	ball.Initialize(0, window.slices, window.stacks);
+	ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
 	ball2.TakeDown();
-	ball2.Initialize(1, window.slices, window.stacks);
+	ball2.Initialize(1, window.ball_radius, window.slices, window.stacks);
 	player.TakeDown();
-	player.Initialize(2, window.slices, window.stacks);	//hit = 2 to show not a playing object
+	player.Initialize(2, window.ball_radius, window.slices, window.stacks);	//hit = 2 to show not a playing object
 
 	srand (0);		//seed generator
 	for (int i = 0; i < window.num_balls; i++)

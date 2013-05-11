@@ -18,7 +18,7 @@ class Sphere : public Object
 public:
 	Sphere();
 	
-	bool Initialize( int hit, GLint slices = 30, GLint stacks = 30);
+	bool Initialize( int hit, GLfloat radius, GLint slices = 30, GLint stacks = 30);
 
 	void hit(float time, float born_time);
 	bool is_sphere_hit();

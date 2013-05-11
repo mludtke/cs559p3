@@ -1,3 +1,10 @@
+/********************************************************************
+*	Skybox
+*
+*	Design of a skybox. Import a specific layout of a skybox texture
+*	to get the skybox to appear as a landscape.
+*********************************************************************/
+
 #include <iostream>
 #include "skybox.h"
 

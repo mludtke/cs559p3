@@ -163,6 +163,8 @@
     <Image Include="Broken-glass.jpg" />
     <Image Include="caution.jpg" />
     <Image Include="cloudy.jpg" />
+    <Image Include="crosshair.png" />
+    <Image Include="crosshaircyan.png" />
     <Image Include="cubemap.jpg" />
     <Image Include="earth.jpg" />
     <Image Include="field.jpg" />

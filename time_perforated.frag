@@ -18,14 +18,13 @@ void main()
   bvec2 toDiscard = greaterThan( fract(TexCoord * scale ), vec2(0.9,0.9) * multiplier );
   if( all(toDiscard) )
 		discard;
-  if( gl_FrontFacing ) {
+  if( gl_FrontFacing ) 
+  {
     //FragColor = vec4(FrontColor, 1.0);
- FragColor = vec4(LightIntensity, 1.0);
-  }
- else {
- //   //FragColor = vec4(BackColor, 1.0);
- //FragColor = vec4(LightIntensity, 1.0);
+	FragColor = vec4(LightIntensity, 1.0);
+	}
+ else 
+ {
     FragColor = mix( vec4(BackColor,1.0), vec4(FrontColor,1.0), 0.7 );
- //   //FragColor = mix( vec4(BackColor,1.0), vec4(FrontColor,1.0), 0.1 );
-  }
+ }
 }

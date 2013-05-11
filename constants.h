@@ -1,3 +1,12 @@
+/*********************************************
+*	Constants
+*
+*	Constants used for colors and materials
+*
+*
+*********************************************/
+
+
 #pragma once
 #include <gl/freeglut.h>
 #include <glm/glm.hpp>

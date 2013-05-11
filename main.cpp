@@ -1,10 +1,19 @@
-/*	
-Project3 - Morgan Ludtke & Faiz Lurman
-
-*/
+/********************************************************************************	
+*	Project3 - Moshball
+*
+*	Morgan Ludtke & Faiz Lurman
+*
+*	Moshball is a first person moving ball game where the objective is to hit all of
+*	the balls before the timers go out.  You increase levels after you get all the
+*	balls on the current stage. Obstacles can get in your way and be careful for 
+*	bombs in the later levels.
+*
+*	5/10/13
+***********************************************************************************/
 
 #include "main.h"
 
+//Displays time above the balls
 void DisplayTime(mat4 modelview, mat4 projection, float time, vec3 position)
 {
 	ostringstream convert;
@@ -20,8 +29,9 @@ void DisplayTime(mat4 modelview, mat4 projection, float time, vec3 position)
 	glLoadMatrixf(value_ptr(projection));
 	glViewport(0, 0, window.size.x, window.size.y);
 	glMatrixMode(GL_MODELVIEW);
+	modelview = translate(modelview, vec3(-window.ball_radius / 2.0f, 0.0f, -window.ball_radius / 2.0f));
 	glLoadMatrixf(value_ptr(modelview));
-	glTranslatef(-0.2f + -0.175f * (3-1), window.ball_radius * 1.5f, 0.0f);
+	glTranslatef(0.0f/*-0.2f + -0.175f * (3-1)*/, window.ball_radius * 1.5f, 0.0f);
 	glRotatef(angleV, 0.0f, 1.0f, 0.0f);
 	glScaled(0.01, 0.01, 0.01);
 	glPushMatrix();
@@ -46,8 +56,9 @@ void DisplayInstructions()
 	glViewport(0, 0, window.size.x, window.size.y);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslated(window.size.x - 350, 15 * s->size(), -5.5);
-	glScaled(0.1, 0.1, 1.0);
+	glTranslated(window.size.x - 450, 19 * s->size(), -5.5);
+	glScaled(0.14, 0.14, 1.0);
+	glLineWidth(3.0f);
 	for (auto i = s->begin(); i < s->end(); ++i)
 	{
 		glPushMatrix();
@@ -55,6 +66,7 @@ void DisplayInstructions()
 		glPopMatrix();
 		glTranslated(0, -150, 0);
 	}
+	glLineWidth(1.0f);
 }
 
 
@@ -136,6 +148,21 @@ void KeyboardFunc(unsigned char c, GLint x, GLint y)
 		bomb.StepShader();
 		break;
 
+	case 'B':
+	case 'b':
+		window.ball_radius += 0.1f;
+
+		ball.TakeDown();
+		ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
+		ball2.TakeDown();
+		ball2.Initialize(1, window.ball_radius, window.slices, window.stacks);
+		player.TakeDown();
+		player.Initialize(2, window.ball_radius, window.slices, window.stacks);
+		bomb.TakeDown();
+		bomb.Initialize(3, window.ball_radius, window.slices, window.stacks);
+
+		break;
+
 	case 'F':
 	case 'f':
 		ground.StepShader();
@@ -200,13 +227,13 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 		++window.slices;
 		++window.stacks;
 		ball.TakeDown();
-		ball.Initialize(0, window.slices, window.stacks);
+		ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
 		ball2.TakeDown();
-		ball2.Initialize(1, window.slices, window.stacks);
+		ball2.Initialize(1, window.ball_radius, window.slices, window.stacks);
 		player.TakeDown();
-		player.Initialize(2, window.slices, window.stacks);
+		player.Initialize(2, window.ball_radius, window.slices, window.stacks);
 		bomb.TakeDown();
-		bomb.Initialize(3, window.slices, window.stacks);
+		bomb.Initialize(3, window.ball_radius, window.slices, window.stacks);
 		break;
 
 	case GLUT_KEY_PAGE_DOWN:	//decreases the number of vertices for all objects
@@ -217,13 +244,13 @@ void SpecialFunc(GLint key, GLint xPt, GLint yPt)
 			--window.stacks;
 			window.stacks = clamp(window.stacks, 2, 50);
 			ball2.TakeDown();
-			ball2.Initialize(1, window.slices, window.stacks);
+			ball2.Initialize(1, window.ball_radius, window.slices, window.stacks);
 			ball.TakeDown();
-			ball.Initialize(0, window.slices, window.stacks);
+			ball.Initialize(0, window.ball_radius, window.slices, window.stacks);
 			player.TakeDown();
-			player.Initialize(2, window.slices, window.stacks);
+			player.Initialize(2, window.ball_radius, window.slices, window.stacks);
 			bomb.TakeDown();
-			bomb.Initialize(3, window.slices, window.stacks);
+			bomb.Initialize(3, window.ball_radius, window.slices, window.stacks);
 		}
 		break;
 
@@ -477,7 +504,8 @@ void DisplayFunc3()
 	modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 	modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
 	modelview = translate(modelview, vec3(xpos, ypos, zpos));
-	player.Draw(projection, modelview, window.size, window.stage, window.shader);
+	if (debug_mode != 1)
+		player.Draw(projection, modelview, window.size, window.stage, window.shader);
 	modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
 	window.num_hit = 0;
@@ -614,6 +642,9 @@ void DisplayFunc()
 	ostringstream convert;
 	convert << (int)current_time;
 	string display_current_time = convert.str();
+
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
 
 	if (!window.paused)
 	{
@@ -856,7 +887,9 @@ void DisplayFunc()
 			modelview = translate(modelview, vec3(0.0f, -1.0f, 0.0f));
 			modelview = translate(modelview, vec3(0.0f, window.ball_radius, 0.0f));	//make sure balls are on ground
 			modelview = translate(modelview, vec3(xpos, ypos, zpos));
-			player.Draw(projection, modelview, window.size, window.stage, window.shader);
+			
+			if (debug_mode != 1)
+				player.Draw(projection, modelview, window.size, window.stage, window.shader);
 			modelview = translate(modelview, vec3(-xpos, -ypos, -zpos));
 
 			window.num_hit = 0;
@@ -928,37 +961,6 @@ void DisplayFunc()
 				modelview = translate(modelview, -boxes.at(i).getPostion());
 			}
 
-			//if (window.hit_something) // display a cracked screen if hit something
-			//{
-			//	/*modelview = translate(modelview, vec3(xpos + 0.25f * (lookatX - xpos), -7.0f, zpos + 0.25f * (lookatZ - zpos)));
-			//	modelview = rotate(modelview, angleV, vec3(0.0f, 1.0f, 0.0f));
-			//	modelview = scale(modelview, vec3(0.5f, 1.0f, 0.5f));*/
-			//	//glMatrixMode(GL_PROJECTION);
-			//	//glLoadIdentity();
-			//	//gluOrtho2D(0.0,window.size.x, 0.0, window.size.y);
-			//	//projection = ortho(0, window.size.x, 0, window.size.y, 1, 10);
-			//	//glMatrixMode(GL_MODELVIEW);
-			//	//glLoadIdentity();
-			//	//modelview = mat4(1.0f);
-			//	//glLoadMatrixf(value_ptr(modelview));
-			//	
-			//	//screen.DrawScreen(projection, modelview, window.size, fbo, 6);  //Draw cracked screen
-			//	//,odelview = translate(modelview, vec3(-lookatX, 15.0f, -lookatZ));
-			//	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-			//	/*glMatrixMode(GL_PROJECTION);
-			//	glLoadIdentity();
-			//	glOrtho(0, 1, 0, 1, 0, 1);
-			//	glMatrixMode(GL_MODELVIEW);
-			//	glColor3f(0.0f, 0.0f, 0.0f);
-			//	glBegin(GL_QUADS);
-			//	glVertex2f(0,0);
-			//	glVertex2f(1,0);
-			//	glVertex2f(1,1);
-			//	glVertex2f(0,1);
-			//	glEnd();*/
-			//	DisplayFuncCrack();
-			//}
 
 			if (!window.gameStart) //Display start screen
 			{
@@ -978,7 +980,8 @@ void DisplayFunc()
 				modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
 				screen.DrawScreen(projection, modelview, window.size, fbo, 3);
 			}
-			if (window.gameWon)
+
+			if (window.gameWon) //Display winning screen
 			{
 				modelview = rotate(modelview, angleH, vec3(0.0f, 1.0f, 0.0f));
 				screen.DrawScreen(projection, modelview, window.size, fbo, 4);
@@ -1164,13 +1167,13 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(GLEW_OK == glewInit());	
 
 	//initialize all objects, and returns error if failed
-	if (!ball.Initialize(0, window.slices, window.stacks))
+	if (!ball.Initialize(0, window.ball_radius, window.slices, window.stacks))
 		return 0;
-	if (!ball2.Initialize(1, window.slices, window.stacks))
+	if (!ball2.Initialize(1, window.ball_radius, window.slices, window.stacks))
 		return 0;
-	if (!player.Initialize(2, window.slices, window.stacks))	//hit = 2 to show not a playing object
+	if (!player.Initialize(2, window.ball_radius, window.slices, window.stacks))	//hit = 2 to show not a playing object
 		return 0;
-	if (!bomb.Initialize(3, window.slices, window.stacks))
+	if (!bomb.Initialize(3, window.ball_radius, window.slices, window.stacks))
 		return 0;
 	if (!ground.InitializeFloor(false, false, false))
 		return 0;
@@ -1248,6 +1251,7 @@ GLint main(GLint argc, GLchar * argv[])
 	assert(TextureManager::Inst()->LoadTexture((const char *) "you_lost.jpg", 11));
 	assert(TextureManager::Inst()->LoadTexture((const char *) "you_won.jpg", 12));
 	assert(TextureManager::Inst()->LoadTexture((const char *) "field.jpg", 13));
+	//assert(TextureManager::Inst()->LoadTexture((const char *) "crosshaircyan.png", 13));
 	assert(TextureManager::Inst()->LoadTexture((const char *) "broken-glass.jpg", 14));
 
 	//ball textures

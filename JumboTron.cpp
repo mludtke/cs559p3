@@ -1,6 +1,10 @@
-/*	
-
-*/
+/************************************************************
+*	Jumbotron
+*
+*	A jumbotron object. Also can be used to display screens, 
+*	such as menus
+*
+************************************************************/
 
 #include <iostream>
 #include "JumboTron.h"

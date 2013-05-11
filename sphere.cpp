@@ -1,3 +1,10 @@
+/*****************************************************
+*	Sphere
+*
+*	Spherical object with an assortment of shaders.
+*****************************************************/
+
+
 #include <iostream>
 #include "Sphere.h"
 
@@ -155,7 +162,7 @@ void Sphere::setPosition(vec3 pos)
 	position = pos;
 }
 
-bool Sphere::Initialize(int hit, GLint slices, GLint stacks)
+bool Sphere::Initialize(int hit, GLfloat radius, GLint slices, GLint stacks )
 {
 	if (this->GLReturnedError("Sphere::Initialize - on entry"))
 		return false;
@@ -185,7 +192,6 @@ bool Sphere::Initialize(int hit, GLint slices, GLint stacks)
 		is_hit = 3;
 	}
 
-	GLfloat radius = 1.0f;  
 	GLfloat del = 10.0f;
 	//  p1 = p2
 	//  ||   ||
@@ -193,11 +199,11 @@ bool Sphere::Initialize(int hit, GLint slices, GLint stacks)
 	GLfloat x0,y0,z0, x1,y1,z1, x2,y2,z2, x3,y3,z3;
 	VertexAttributesPCNT cur_bot_vertex, cur_top_vertex, nxt_top_vertex, nxt_bot_vertex;
 	// http://csclab.murraystate.edu/bob.pilgrim/515/texture_maps_project.html
-	for (GLfloat verAng = 0; verAng < 180.0f; verAng += del)
+	for (GLfloat verAng = 0; verAng < 180.0f; verAng += del) // stacks
 	{
 		y0 = y3 = radius * cos(radians(verAng));
 		y1 = y2 = radius * cos(radians(verAng + del));
-		for (GLfloat horAng = 0; horAng < 360.0f; horAng += del)
+		for (GLfloat horAng = 0; horAng < 360.0f; horAng += del) //slices
 		{
 			x0 = radius * cos(radians(horAng)) * sin(radians(verAng));
 			x1 = radius * cos(radians(horAng)) * sin(radians(verAng + del));

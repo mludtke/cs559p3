@@ -319,5 +319,11 @@
     <Image Include="grimnight.jpg">
       <Filter>Texture files</Filter>
     </Image>
+    <Image Include="crosshair.png">
+      <Filter>Texture files</Filter>
+    </Image>
+    <Image Include="crosshaircyan.png">
+      <Filter>Texture files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
-/*	
-
-*/
+/*************************************************************	
+*	Scoreboard
+*
+*	A scoreboard object, similar to the Jumbotron
+**************************************************************/
 
 #include <iostream>
 #include "Scoreboard.h"

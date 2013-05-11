@@ -1,6 +1,8 @@
-/*	
-
-*/
+/***************************************************************
+*	Obstacle
+*
+*	A box shaped object that can be used as an obstacle
+****************************************************************/
 
 #include <iostream>
 #include "Obstacle.h"
